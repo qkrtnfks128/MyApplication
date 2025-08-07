@@ -43,12 +43,13 @@ fun AppBar(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .height(130.dp)
+            .wrapContentHeight()
             .padding(start = 40.dp, top = 24.dp, end = 40.dp, bottom = 24.dp),
         color = MaterialTheme.colorScheme.surface,
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
+            
             contentAlignment = Alignment.Center
         ) {
             // 가운데 위젯 - 항상 중앙에 위치
@@ -98,15 +99,17 @@ fun AppBar(
             }
             
             // 우측 종료 버튼 섹션 - 오른쪽에 고정
-            Box(
+            Button(
+                onClick = { /* 종료 버튼 클릭 시 동작 구현 */ },
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .shadow(elevation = 12.dp, spotColor = Color(0x26000000), ambientColor = Color(0x26000000))
-                    .width(158.dp)
-                    .height(82.dp)
                     .background(color = Color.White, shape = RoundedCornerShape(size = 100.dp))
                     .padding(start = 20.dp, top = 20.dp, end = 30.dp, bottom = 20.dp),
-                contentAlignment = Alignment.Center
+                shape = RoundedCornerShape(size = 100.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
+                contentPadding = PaddingValues(0.dp),
+                elevation = null
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -116,9 +119,8 @@ fun AppBar(
                         imageVector = Icons.Default.PowerSettingsNew,
                         contentDescription = "종료",
                         tint = Color.Red,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(42.dp)
                     )
-                    
                     Text(
                         text = "종료",
                         style = TextStyle(
