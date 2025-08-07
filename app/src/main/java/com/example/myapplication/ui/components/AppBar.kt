@@ -26,20 +26,29 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import androidx.compose.ui.tooling.preview.Preview
-
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 enum class LeftButtonType {
     NONE, HOME, BACK, LOGOUT
 }
 
-@Preview(showBackground = true)
+data class ButtonConfig(
+    val icon: ImageVector,
+    val text: String,
+    val iconTint: Color = Color.Black,
+    val textColor: Color = Color.Black
+)
+
 @Composable
 fun AppBar(
     leftButtonType: LeftButtonType = LeftButtonType.NONE,
     centerWidget: @Composable (() -> Unit)? = null,
-    onLeftButtonClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current  // Context 가져오기
+    
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -49,91 +58,154 @@ fun AppBar(
     ) {
         Box(
             modifier = Modifier.fillMaxWidth(),
-            
             contentAlignment = Alignment.Center
         ) {
             // 가운데 위젯 - 항상 중앙에 위치
             centerWidget?.invoke()
             
-            // 왼쪽 버튼 섹션 - 왼쪽에 고정
+            // 왼쪽 버튼 섹션
             if (leftButtonType != LeftButtonType.NONE) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White)
-                        .clickable { onLeftButtonClick?.invoke() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    when (leftButtonType) {
-                        LeftButtonType.HOME -> {
-                            Icon(
-                                imageVector = Icons.Default.Home,
-                                contentDescription = "홈",
-                                tint = Color.Black,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        LeftButtonType.BACK -> {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "뒤로가기",
-                                tint = Color.Black,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        LeftButtonType.LOGOUT -> {
-                            Icon(
-                                imageVector = Icons.Default.Logout,
-                                contentDescription = "로그아웃",
-                                tint = Color.Black,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        LeftButtonType.NONE -> {
-                            // 이 경우는 실행되지 않음
-                        }
-                    }
-                }
+                val leftButtonConfig = getLeftButtonConfig(leftButtonType)
+                val leftButtonClickHandler = getLeftButtonClickHandler(leftButtonType, context)  // Context 전달
+                AppBarButton(
+                    buttonConfig = leftButtonConfig,
+                    onClick = leftButtonClickHandler,   
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
             }
             
-            // 우측 종료 버튼 섹션 - 오른쪽에 고정
-            Button(
-                onClick = { /* 종료 버튼 클릭 시 동작 구현 */ },
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .shadow(elevation = 12.dp, spotColor = Color(0x26000000), ambientColor = Color(0x26000000))
-                    .background(color = Color.White, shape = RoundedCornerShape(size = 100.dp))
-                    .padding(start = 20.dp, top = 20.dp, end = 30.dp, bottom = 20.dp),
-                shape = RoundedCornerShape(size = 100.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                contentPadding = PaddingValues(0.dp),
-                elevation = null
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.PowerSettingsNew,
-                        contentDescription = "종료",
-                        tint = Color.Red,
-                        modifier = Modifier.size(42.dp)
-                    )
-                    Text(
-                        text = "종료",
-                        style = TextStyle(
-                          fontSize = 40.sp,
-                          lineHeight = 52.sp,
-                          fontFamily = FontFamily(Font(R.font.pretendard)),
-                          fontWeight = FontWeight(600),
-                          color = Color.Black,
-                          textAlign = TextAlign.Center,
-                        )
-                    )
-                }
-            }
+            // 우측 종료 버튼 섹션
+            val rightButtonConfig = ButtonConfig(
+                icon = Icons.Default.PowerSettingsNew,
+                text = "종료",
+                iconTint = Color.Red
+            )
+            AppBarButton(
+                buttonConfig = rightButtonConfig,
+                onClick = {
+                    // 종료 버튼 클릭 시 동작 구현
+                    (context as? android.app.Activity)?.finish()
+
+                },
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
         }
     }
+}
+
+@Composable
+private fun AppBarButton(
+    buttonConfig: ButtonConfig,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .shadow(
+                elevation = 12.dp,
+                spotColor = Color(0x26000000),
+                ambientColor = Color(0x26000000)
+            )
+            .clip(RoundedCornerShape(size = 100.dp))
+            .background(color = Color.White)
+            .clickable { onClick?.invoke() },
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(
+                start = 20.dp,
+                top = 20.dp,
+                end = 30.dp,
+                bottom = 20.dp
+            )
+        ) {
+            Icon(
+                imageVector = buttonConfig.icon,
+                contentDescription = buttonConfig.text,
+                tint = buttonConfig.iconTint,
+                modifier = Modifier.size(42.dp)
+            )
+            Text(
+                text = buttonConfig.text,
+                style = getButtonTextStyle(buttonConfig.textColor)
+            )
+        }
+    }
+}
+
+private fun getLeftButtonConfig(buttonType: LeftButtonType): ButtonConfig {
+    return when (buttonType) {
+        LeftButtonType.HOME -> ButtonConfig(
+            icon = Icons.Default.Home,
+            text = "홈"
+        )
+        LeftButtonType.BACK -> ButtonConfig(
+            icon = Icons.Default.ArrowBack,
+            text = "뒤로가기"
+        )
+        LeftButtonType.LOGOUT -> ButtonConfig(
+            icon = Icons.Default.Logout,
+            text = "로그아웃"
+        )
+        LeftButtonType.NONE -> ButtonConfig(
+            icon = Icons.Default.Home,
+            text = ""
+        )
+    }
+}
+
+private fun getLeftButtonClickHandler(
+    buttonType: LeftButtonType,
+    context: Context  // Context 파라미터 추가
+): (() -> Unit)? {
+    return when (buttonType) {
+        LeftButtonType.HOME -> { {
+            {
+                Toast.makeText(
+                    context,  // 전달받은 Context 사용
+                    "홈버튼을 눌렀습니다!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            
+        } }
+        LeftButtonType.BACK -> {
+            {
+            // 뒤로가기 버튼 클릭 시 현재 액티비티를 종료하여 이전 화면으로 이동합니다.
+            (context as? android.app.Activity)?.onBackPressed()
+       
+            }
+        }
+        LeftButtonType.LOGOUT -> { {} }
+        LeftButtonType.NONE -> null
+    }
+}
+
+
+private fun getButtonTextStyle(textColor: Color): TextStyle {
+    return TextStyle(
+        fontSize = 40.sp,
+        lineHeight = 52.sp,
+        fontFamily = FontFamily(Font(R.font.pretendard)),
+        fontWeight = FontWeight(600),
+        color = textColor,
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AppBarPreview() {
+    AppBar(
+        leftButtonType = LeftButtonType.BACK,
+        centerWidget = {
+            Text(
+                text = "김영희 어르신",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    )
 }

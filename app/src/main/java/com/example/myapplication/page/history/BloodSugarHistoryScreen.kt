@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.navigation.NavController
 import com.example.myapplication.model.BloodSugarData
 import com.example.myapplication.model.BloodSugarStatus
@@ -22,6 +24,12 @@ import com.example.myapplication.ui.components.list.HistoryRow
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import com.example.myapplication.R
+
 
 // BloodSugarHistoryScreen은 혈당 기록 내역 화면으로, 혈당 기록 내역을 표시합니다.
 // 혈당 기록 내역은 시간순으로 정렬되며, 각 기록은 혈당 수치와 식전/식후 정보를 포함합니다.
@@ -37,17 +45,44 @@ fun BloodSugarHistoryScreen(navController: NavController) {
         AppBar(
             leftButtonType = LeftButtonType.BACK,
             centerWidget = {
-                Text(
-                    text = "김영희 어르신",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                 
+                        Text(
+                            text = "김영희",
+                            
+                            // Headline/H2_B
+                            style = TextStyle(
+                              fontSize = 50.sp,
+                              lineHeight = 65.sp,
+                              fontFamily = FontFamily(Font(R.font.pretendard)),
+                              fontWeight = FontWeight(700),
+                              color = Color.Black,
+                              textAlign = TextAlign.Center,
+                            )
+                          )
+                  
+                    Spacer(modifier = Modifier.width(6.dp))
+              
+                        Text(
+                            text = "어르신",
+                            style = TextStyle(
+                              fontSize = 50.sp,
+                              lineHeight = 65.sp,
+                              fontFamily = FontFamily(Font(R.font.pretendard)),
+                              fontWeight = FontWeight(600),
+                              color = Color.Black,
+                              textAlign = TextAlign.Center,
+                            )
+                          )
+                   
+                }
             },
-            onLeftButtonClick = {
-                navController.popBackStack()
-            }
-        )
         
+        )
+        val state = rememberScrollState()
         // 혈당 기록 리스트
         LazyColumn(
             modifier = Modifier
@@ -68,8 +103,9 @@ fun BloodSugarHistoryScreen(navController: NavController) {
 
 @Composable
 fun BloodSugarInfoWidget(bloodSugarData: BloodSugarData) {
-    Column(
-        horizontalAlignment = Alignment.End
+    Row(
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         // 혈당 수치와 식전/식후 정보
         Text(
@@ -117,6 +153,13 @@ private fun getMealTypeText(mealType: MealType): String {
 private fun createTestData(): List<BloodSugarData> {
     return listOf(
         BloodSugarData(
+            id = "2",
+            measurementTime = "20240805102000", // 08월 05일 오전 10:20
+            bloodSugarLevel = 180,
+            mealType = MealType.AFTER_MEAL,
+            status = BloodSugarStatus.NORMAL
+        ),
+        BloodSugarData(
             id = "1",
             measurementTime = "20240806091100", // 08월 06일 오전 9:11
             bloodSugarLevel = 235,
@@ -129,6 +172,83 @@ private fun createTestData(): List<BloodSugarData> {
             bloodSugarLevel = 180,
             mealType = MealType.AFTER_MEAL,
             status = BloodSugarStatus.NORMAL
+        ),
+        BloodSugarData(
+            id = "1",
+            measurementTime = "20240806091100", // 08월 06일 오전 9:11
+            bloodSugarLevel = 235,
+            mealType = MealType.BEFORE_MEAL,
+            status = BloodSugarStatus.HIGH
+        ),
+        BloodSugarData(
+            id = "2",
+            measurementTime = "20240805102000", // 08월 05일 오전 10:20
+            bloodSugarLevel = 180,
+            mealType = MealType.AFTER_MEAL,
+            status = BloodSugarStatus.NORMAL
+        ),
+        BloodSugarData(
+            id = "1",
+            measurementTime = "20240806091100", // 08월 06일 오전 9:11
+            bloodSugarLevel = 235,
+            mealType = MealType.BEFORE_MEAL,
+            status = BloodSugarStatus.HIGH
+        ),
+        BloodSugarData(
+            id = "2",
+            measurementTime = "20240805102000", // 08월 05일 오전 10:20
+            bloodSugarLevel = 180,
+            mealType = MealType.AFTER_MEAL,
+            status = BloodSugarStatus.NORMAL
+        ),
+        BloodSugarData(
+            id = "1",
+            measurementTime = "20240806091100", // 08월 06일 오전 9:11
+            bloodSugarLevel = 235,
+            mealType = MealType.BEFORE_MEAL,
+            status = BloodSugarStatus.HIGH
+        ),
+        BloodSugarData(
+            id = "2",
+            measurementTime = "20240805102000", // 08월 05일 오전 10:20
+            bloodSugarLevel = 180,
+            mealType = MealType.AFTER_MEAL,
+            status = BloodSugarStatus.NORMAL
+        ),
+        BloodSugarData(
+            id = "1",
+            measurementTime = "20240806091100", // 08월 06일 오전 9:11
+            bloodSugarLevel = 235,
+            mealType = MealType.BEFORE_MEAL,
+            status = BloodSugarStatus.HIGH
+        ),
+        BloodSugarData(
+            id = "2",
+            measurementTime = "20240805102000", // 08월 05일 오전 10:20
+            bloodSugarLevel = 180,
+            mealType = MealType.AFTER_MEAL,
+            status = BloodSugarStatus.NORMAL
+        ),
+        BloodSugarData(
+            id = "1",
+            measurementTime = "20240806091100", // 08월 06일 오전 9:11
+            bloodSugarLevel = 235,
+            mealType = MealType.BEFORE_MEAL,
+            status = BloodSugarStatus.HIGH
+        ),
+        BloodSugarData(
+            id = "2",
+            measurementTime = "20240805102000", // 08월 05일 오전 10:20
+            bloodSugarLevel = 180,
+            mealType = MealType.AFTER_MEAL,
+            status = BloodSugarStatus.NORMAL
+        ),
+        BloodSugarData(
+            id = "1",
+            measurementTime = "20240806091100", // 08월 06일 오전 9:11
+            bloodSugarLevel = 235,
+            mealType = MealType.BEFORE_MEAL,
+            status = BloodSugarStatus.HIGH
         ),
         BloodSugarData(
             id = "3",
