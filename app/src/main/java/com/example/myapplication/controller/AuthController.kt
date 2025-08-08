@@ -1,6 +1,7 @@
 package com.example.myapplication.controller
 
-import com.example.myapplication.model.User
+import com.example.myapplication.model.Admin
+import com.example.myapplication.model.AdminSession
 import com.example.myapplication.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,13 +11,13 @@ import kotlinx.coroutines.flow.asStateFlow
 class AuthController(
     private val authRepository: AuthRepository
 ) {
-    private val _currentUser = MutableStateFlow<User?>(null)
-    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+    private val _currentAdmin = MutableStateFlow<Admin?>(null)
+    val currentAdmin: StateFlow<Admin?> = _currentAdmin.asStateFlow()
     
-    suspend fun adminLogin(email: String, password: String): Result<User> {
+    suspend fun adminLogin(email: String, password: String): Result<Admin> {
         return authRepository.adminLogin(email, password).also { result ->
-            result.onSuccess { user ->
-                _currentUser.value = user
+            result.onSuccess { admin ->
+                _currentAdmin.value = admin
             }
         }
     }
@@ -24,27 +25,35 @@ class AuthController(
     suspend fun logout(): Result<Unit> {
         return authRepository.logout().also { result ->
             if (result.isSuccess) {
-                _currentUser.value = null
+                _currentAdmin.value = null
             }
         }
     }
     
-    suspend fun getCurrentUser(): User? {
-        return authRepository.getCurrentUser().also { user ->
-            _currentUser.value = user
+    suspend fun getCurrentAdmin(): Admin? {
+        return authRepository.getCurrentAdmin().also { admin ->
+            _currentAdmin.value = admin
         }
     }
     
-    suspend fun updateUser(user: User) {
-        authRepository.saveUser(user)
-        _currentUser.value = user
+    suspend fun updateAdmin(admin: Admin) {
+        authRepository.saveAdmin(admin)
+        _currentAdmin.value = admin
     }
     
-    fun observeUser(): Flow<User?> {
-        return currentUser
+    fun observeAdmin(): Flow<Admin?> {
+        return currentAdmin
     }
     
     fun isLoggedIn(): Boolean {
-        return currentUser.value?.isLoggedIn == true
+        return currentAdmin.value?.isLoggedIn == true
+    }
+
+    suspend fun getAdminSession(): AdminSession? {
+        return authRepository.getAdminSession()
+    }
+
+    fun observeAdminSession(): Flow<AdminSession?> {
+        return authRepository.observeAdminSession()
     }
 }

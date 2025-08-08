@@ -25,7 +25,7 @@ import com.example.myapplication.components.AppBar
 import com.example.myapplication.components.LeftButtonType
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.MyApplicationTheme
-import com.example.myapplication.manager.UserManager
+import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.utils.LogManager
 
 
@@ -98,11 +98,12 @@ fun MainScreen(navController: NavController) {
                 backgroundColor = Color(0xFFED8936), // 주황색
                 onClick = { /* 혈압 측정 로직 */ 
                     LogManager.userAction(MAIN_SCREEN_TAG, "혈압 측정 버튼 클릭")
-                    if (!com.example.myapplication.manager.UserManager.isLoggedIn()) {
-                        LogManager.navigation(MAIN_SCREEN_TAG, "MainScreen", "Login")
-                        navController.navigate(Screen.Login.route)
-                        return@MeasurementButton
-                    }},
+                    // if (!com.example.myapplication.manager.AdminManager.isLoggedIn()) {
+                    //     LogManager.navigation(MAIN_SCREEN_TAG, "MainScreen", "Login")
+                    //     navController.navigate(Screen.Login.route)
+                    //     return@MeasurementButton
+                    // }
+                },
                 modifier = Modifier.weight(1f)
             )
             

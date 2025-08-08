@@ -1,9 +1,12 @@
 package com.example.myapplication.repository
 
-import com.example.myapplication.model.User
+import com.example.myapplication.model.Admin
+import com.example.myapplication.model.AdminSession
+import com.example.myapplication.model.AdminKindergarten
 import com.example.myapplication.network.RetrofitProvider
 import com.example.myapplication.network.api.AuthApi
-import com.example.myapplication.network.dto.LoginRequest
+import com.example.myapplication.network.dto.AdminLoginRequest
+import com.example.myapplication.network.dto.AdminLoginResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,34 +14,51 @@ import kotlinx.coroutines.flow.update
 import okhttp3.OkHttpClient
 
 interface AuthRepository {
-    suspend fun login(email: String, password: String): Result<User>
+    suspend fun adminLogin(email: String, password: String): Result<Admin>
     suspend fun logout(): Result<Unit>
-    suspend fun getCurrentUser(): User?
-    suspend fun saveUser(user: User)
+    suspend fun getCurrentAdmin(): Admin?
+    suspend fun saveAdmin(admin: Admin)
     suspend fun clearUser()
-    fun observeUser(): Flow<User?>
+    fun observeAdmin(): Flow<Admin?>
+    suspend fun getAdminSession(): AdminSession?
+    fun observeAdminSession(): Flow<AdminSession?>
 }
 
 class AuthRepositoryImpl(
     private val authApi: AuthApi,
     private val tokenStore: TokenStore
 ) : AuthRepository {
-    private val currentUserState: MutableStateFlow<User?> = MutableStateFlow(null)
+    private val currentAdminState: MutableStateFlow<Admin?> = MutableStateFlow(null)
+    private val adminSessionState: MutableStateFlow<AdminSession?> = MutableStateFlow(null)
+    private companion object {
+        private const val DEFAULT_ADMIN_NAME: String = "Administrator"
+    }
 
-    override suspend fun login(email: String, password: String): Result<User> {
+    override suspend fun adminLogin(email: String, password: String): Result<Admin> {
         return try {
-          // 자동로그인 1, 수동로그인 2
-            val response = authApi.login(LoginRequest(USER_TEL = email, USER_PW = password, AUTO_LOGIN = "2"))
-            tokenStore.saveToken(response.token)
-            val user = User(
-                id = response.id,
-                email = response.email,
-                name = response.name,
-                isLoggedIn = true,
-                lastLoginTime = System.currentTimeMillis()
+            // AUTO_LOGIN: 자동로그인 1, 수동로그인 2
+            val response: AdminLoginResponse = authApi.adminLogin(
+                AdminLoginRequest(USER_TEL = email, USER_PW = password, AUTO_LOGIN = "2")
             )
-            currentUserState.update { user }
-            Result.success(user)
+
+            // 세션 매핑 및 저장
+            val kindergartens: List<AdminKindergarten> = response.adminList.map {
+                AdminKindergarten(
+                    kindergartenUuid = it.KINDERGARTEN_UUID,
+                    kindergartenName = it.KINDERGARTEN_NAME,
+                    classCount = it.CLASS_CNT,
+                    password = it.PWD,
+                    companyId = it.COMPANY_ID,
+                    registrationDate = it.REGISTRATION_DATE
+                )
+            }
+            val session = AdminSession(
+                userUuid = response.user_uuid,
+                statusCode = response.status_code,
+                adminKindergartens = kindergartens
+            )
+            adminSessionState.update { session }
+          
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -48,27 +68,36 @@ class AuthRepositoryImpl(
         return try {
             authApi.logout()
             tokenStore.clearToken()
-            currentUserState.update { null }
+            currentAdminState.update { null }
+            adminSessionState.update { null }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun getCurrentUser(): User? {
-        return currentUserState.value
+    override suspend fun getCurrentAdmin(): Admin? {
+        return currentAdminState.value
     }
 
-    override suspend fun saveUser(user: User) {
-        currentUserState.update { user }
+    override suspend fun saveAdmin(admin: Admin) {
+        currentAdminState.update { admin }
     }
 
     override suspend fun clearUser() {
-        currentUserState.update { null }
+        currentAdminState.update { null }
     }
 
-    override fun observeUser(): Flow<User?> {
-        return currentUserState.asStateFlow()
+    override fun observeAdmin(): Flow<Admin?> {
+        return currentAdminState.asStateFlow()
+    }
+
+    override suspend fun getAdminSession(): AdminSession? {
+        return adminSessionState.value
+    }
+
+    override fun observeAdminSession(): Flow<AdminSession?> {
+        return adminSessionState.asStateFlow()
     }
 }
 

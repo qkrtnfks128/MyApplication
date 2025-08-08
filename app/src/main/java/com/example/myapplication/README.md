@@ -27,7 +27,6 @@
 ## 새 API 추가 플로우
 
 - 요구 확정: 메서드·경로, 요청/응답, 인증 여부.
-- DTO 정의: `network/dto/`에 `XxxRequest`, `XxxResponse` 생성.
 - API 인터페이스: `network/api/`에 `XxxApi` 추가.
 - Repository 구현: Retrofit 호출 → DTO→모델 매핑 → 캐싱/에러 정책 반영.
 - Controller 연동: 메서드 노출, 상태(StateFlow 등) 갱신.

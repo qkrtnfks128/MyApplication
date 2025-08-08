@@ -40,8 +40,8 @@ object UserManager {
         this.authController = authController
     }
 
-    suspend fun login(email: String, password: String): Result<User> {
-        return authController?.login(email, password)
+    suspend fun adminLogin(email: String, password: String): Result<User> {
+        return authController?.adminLogin(email, password)
             ?: Result.failure(IllegalStateException("Not initialized"))
     }
 

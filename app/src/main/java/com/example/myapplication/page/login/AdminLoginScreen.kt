@@ -9,7 +9,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.myapplication.manager.UserManager
+import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.utils.LogManager
 import kotlinx.coroutines.launch
@@ -17,10 +17,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
+import com.example.myapplication.navigation.Screen
 
-private const val LOGIN_SCREEN_TAG: String = "LoginScreen"
+private const val ADMIN_LOGIN_SCREEN_TAG: String = "AdminLoginScreen"
 @Composable
-fun LoginScreen(
+fun AdminLoginScreen(
     navController: NavController
 ) {
 
@@ -30,7 +31,7 @@ fun LoginScreen(
     var errorMessage by remember { mutableStateOf("") }
     
     val scope = rememberCoroutineScope()
-    val currentUser = UserManager.observeUser()?.collectAsStateWithLifecycle()
+    val currentAdmin = AdminManager.observeAdmin()?.collectAsStateWithLifecycle()
     val context = LocalContext.current
     Column(
         modifier = Modifier
@@ -40,7 +41,7 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "로그인",
+            text = "관리자 로그인",
             style = MaterialTheme.typography.headlineMedium
         )
         
@@ -80,15 +81,19 @@ fun LoginScreen(
                     isLoading = true
                     errorMessage = ""
                     
-                    val result = UserManager.login(email, password)
+                    val result = AdminManager.adminLogin(email, password)
                     result.fold(
                         onSuccess = { user ->
-                          LogManager.auth(LOGIN_SCREEN_TAG, "로그인", true)
+                          LogManager.auth(ADMIN_LOGIN_SCREEN_TAG, "관리자 로그인", true)
                           
                            Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
+                           navController.navigate(Screen.Main.route) {
+                               popUpTo(Screen.Login.route) { inclusive = true }
+                               launchSingleTop = true
+                           }
                         },
                         onFailure = { exception ->
-                            LogManager.auth(LOGIN_SCREEN_TAG, "로그인", false)
+                            LogManager.auth(ADMIN_LOGIN_SCREEN_TAG, "관리자 로그인", false)
                             errorMessage = "로그인 실패: ${exception.message}"
                         }
                     )
@@ -110,8 +115,8 @@ fun LoginScreen(
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        // 현재 로그인된 사용자 정보 표시
-        currentUser?.value?.let { user ->
+        // 현재 로그인된 관리자 정보 표시
+        currentAdmin?.value?.let { admin ->
             Card(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -119,18 +124,18 @@ fun LoginScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "현재 로그인된 사용자",
+                        text = "현재 로그인된 관리자",
                         style = MaterialTheme.typography.titleSmall
                     )
-                    Text("이름: ${user.name}")
-                    Text("이메일: ${user.email}")
+                    Text("이름: ${admin.name}")
+                    Text("이메일: ${admin.email}")
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     OutlinedButton(
                         onClick = {
                             scope.launch {
-                                UserManager.logout()
+                                AdminManager.logout()
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -145,8 +150,8 @@ fun LoginScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
+fun AdminLoginScreenPreview() {
     MyApplicationTheme {
-        LoginScreen(rememberNavController())
+        AdminLoginScreen(rememberNavController())
     }
 }

@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
-import com.example.myapplication.manager.UserManager
+import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.navigation.AppNavigation
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.utils.LogManager
@@ -35,13 +35,13 @@ class MainActivity : ComponentActivity() {
     
     private fun checkLoginStatus() {
         lifecycleScope.launch {
-            val currentUser = UserManager.getCurrentUser()
-            if (currentUser == null) {
+            val currentAdmin = AdminManager.getCurrentAdmin()
+            if (currentAdmin == null) {
                 // 로그인되지 않은 경우 처리
                 // TODO: 로그인 화면으로 이동하거나 자동 로그인 시도
                 LogManager.info(TAG, "사용자가 로그인되지 않았습니다.")
             } else {
-                LogManager.info(TAG, "현재 로그인된 사용자: ${currentUser.name}")
+                LogManager.info(TAG, "현재 로그인된 관리자: ${currentAdmin.name}")
             }
         }
     }

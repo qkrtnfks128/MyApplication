@@ -8,7 +8,7 @@ Login 페이지는 사용자 인증을 담당하는 UI 계층입니다. 로그�
 
 ```
 page/login/
-├── LoginScreen.kt             # 로그인 화면 컴포넌트
+├── LoginScreen.kt             # 관리자 로그인 화면 컴포넌트 (실제 컴포저블명: AdminLoginScreen)
 └── README.md                 # 이 파일
 ```
 
@@ -36,7 +36,7 @@ page/login/
 
 ```kotlin
 @Composable
-fun LoginScreen(
+fun AdminLoginScreen(
     onLoginSuccess: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
@@ -121,7 +121,7 @@ private fun UserInfoCard(
 @Composable
 fun LoginScreenPreview() {
     MyApplicationTheme {
-        LoginScreen()
+        AdminLoginScreen()
     }
 }
 ```
