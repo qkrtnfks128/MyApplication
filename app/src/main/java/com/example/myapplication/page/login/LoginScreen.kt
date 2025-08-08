@@ -16,10 +16,9 @@ import kotlinx.coroutines.launch
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import android.widget.Toast
-import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 
-        private const val TAG = "LoginScreen"
+private const val LOGIN_SCREEN_TAG: String = "LoginScreen"
 @Composable
 fun LoginScreen(
     navController: NavController
@@ -84,12 +83,12 @@ fun LoginScreen(
                     val result = UserManager.login(email, password)
                     result.fold(
                         onSuccess = { user ->
-                          LogManager.auth(TAG, "로그인", true)
+                          LogManager.auth(LOGIN_SCREEN_TAG, "로그인", true)
                           
                            Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
                         },
                         onFailure = { exception ->
-                            LogManager.auth(TAG, "로그인", false)
+                            LogManager.auth(LOGIN_SCREEN_TAG, "로그인", false)
                             errorMessage = "로그인 실패: ${exception.message}"
                         }
                     )
