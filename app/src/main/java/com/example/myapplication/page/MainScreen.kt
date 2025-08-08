@@ -31,7 +31,7 @@ import com.example.myapplication.utils.LogManager
 
 
 // MainScreen은 메인 화면으로, 혈당, 혈압, 체중 측정 버튼을 포함합니다.
-// 각 버튼은 클릭 시 로그인화면 또는 해당 측정 화면으로 이동합니다.
+// 각 버튼은 클릭 시 유저로그인화면 또는 해당 측정 화면으로 이동합니다.
 private const val MAIN_SCREEN_TAG: String = "MainScreen"
 @Composable
 fun MainScreen(navController: NavController) {
@@ -51,12 +51,13 @@ fun MainScreen(navController: NavController) {
                         .clickable { /* 클릭 시 동작 추가 가능 */
                             LogManager.userAction(MAIN_SCREEN_TAG, "메인 앱바 중앙 텍스트 클릭")
                             // 기관 선택이 되어있는지 확인
-                            //
+                        navController.navigate(Screen.AdminOrgSelect.route)
                         }
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "오늘의 건강을 확인해볼까요?",
+                        text = com.example.myapplication.manager.SelectedOrgStore.getSelected()?.orgName
+                            ?: "오늘의 건강을 확인해볼까요?",
                         style = TextStyle(
                             fontSize = 40.sp,
                             lineHeight = 52.sp,

@@ -2,7 +2,7 @@ package com.example.myapplication.repository
 
 import com.example.myapplication.model.Admin
 import com.example.myapplication.model.AdminSession
-import com.example.myapplication.model.AdminKindergarten
+import com.example.myapplication.model.AdminOrg
 import com.example.myapplication.network.RetrofitProvider
 import com.example.myapplication.network.api.AuthApi
 import com.example.myapplication.network.dto.AdminLoginRequest
@@ -42,10 +42,10 @@ class AuthRepositoryImpl(
             )
 
             // 세션 매핑 및 저장
-            val kindergartens: List<AdminKindergarten> = response.adminList.map {
-                AdminKindergarten(
-                    kindergartenUuid = it.KINDERGARTEN_UUID,
-                    kindergartenName = it.KINDERGARTEN_NAME,
+            val orgs: List<AdminOrg> = response.adminList.map {
+                AdminOrg(
+                    orgUuid = it.KINDERGARTEN_UUID,
+                    orgName = it.KINDERGARTEN_NAME,
                     classCount = it.CLASS_CNT,
                     password = it.PWD,
                     companyId = it.COMPANY_ID,
@@ -55,10 +55,23 @@ class AuthRepositoryImpl(
             val session = AdminSession(
                 userUuid = response.user_uuid,
                 statusCode = response.status_code,
-                adminKindergartens = kindergartens
+                adminOrgs = orgs
             )
             adminSessionState.update { session }
-          
+
+            if (response.status_code == 0) {
+                val admin = Admin(
+                    id = response.user_uuid,
+                    email = "",
+                    name = DEFAULT_ADMIN_NAME,
+                    isLoggedIn = true,
+                    lastLoginTime = System.currentTimeMillis()
+                )
+                currentAdminState.update { admin }
+                Result.success(admin)
+            } else {
+                Result.failure(IllegalStateException("Admin login failed: status_code=${response.status_code}"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

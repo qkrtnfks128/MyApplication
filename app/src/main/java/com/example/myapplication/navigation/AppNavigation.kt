@@ -11,6 +11,7 @@ import com.example.myapplication.page.history.BloodSugarHistoryScreen
 import com.example.myapplication.page.login.AdminLoginScreen
 import com.example.myapplication.page.splash.SplashScreen
 import com.example.myapplication.utils.LogManager
+import com.example.myapplication.page.admin.AdminOrgSelectScreen
 
 // AppNavigation에서 사용할 네비게이션 관련 함수와 화면을 정의합니다.
 // MainScreen: 메인 화면
@@ -45,6 +46,9 @@ fun AppNavigation() {
         composable(Screen.Login.route) {
             AdminLoginScreen(navController)
         }
+        composable(Screen.AdminOrgSelect.route) {
+            AdminOrgSelectScreen(navController)
+        }
     }
 }
 
@@ -53,4 +57,5 @@ sealed class Screen(val route: String) {
     object Main : Screen("main")
     object BloodSugarHistory : Screen("bloodSugarHistory")
     object Login : Screen("adminLogin")
+    object AdminOrgSelect : Screen("adminOrgSelect")
 } 

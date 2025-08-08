@@ -87,7 +87,7 @@ fun AdminLoginScreen(
                           LogManager.auth(ADMIN_LOGIN_SCREEN_TAG, "관리자 로그인", true)
                           
                            Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
-                           navController.navigate(Screen.Main.route) {
+                           navController.navigate(Screen.AdminOrgSelect.route) {
                                popUpTo(Screen.Login.route) { inclusive = true }
                                launchSingleTop = true
                            }

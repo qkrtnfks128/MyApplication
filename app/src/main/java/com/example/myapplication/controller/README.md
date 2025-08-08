@@ -4,14 +4,6 @@
 
 Controller 계층은 비즈니스 로직을 담당하는 중간 계층입니다. Repository와 UI 계층 사이에서 데이터를 가공하고 상태를 관리합니다.
 
-## 구조 (Structure)
-
-```
-controller/
-├── AuthController.kt          # 인증 관련 비즈니스 로직
-└── README.md                 # 이 파일
-```
-
 ## 주요 특징 (Key Features)
 
 ### 1. 비즈니스 로직 처리
@@ -29,25 +21,6 @@ controller/
 
 - Repository에서 발생한 에러를 적절히 처리
 - UI에 전달할 수 있는 형태로 변환
-
-## 사용 예시 (Usage Example)
-
-```kotlin
-class AuthController(
-    private val authRepository: AuthRepository
-) {
-    private val _currentUser = MutableStateFlow<User?>(null)
-    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
-
-    suspend fun adminLogin(email: String, password: String): Result<User> {
-        return authRepository.adminLogin(email, password).also { result ->
-            result.onSuccess { user ->
-                _currentUser.value = user
-            }
-        }
-    }
-}
-```
 
 ## 네이밍 규칙 (Naming Convention)
 

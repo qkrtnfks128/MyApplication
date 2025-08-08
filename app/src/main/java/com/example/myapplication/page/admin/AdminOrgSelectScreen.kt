@@ -18,18 +18,18 @@ import androidx.navigation.NavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.manager.AdminManager
-import com.example.myapplication.manager.SelectedKindergartenStore
-import com.example.myapplication.model.AdminKindergarten
+import com.example.myapplication.manager.SelectedOrgStore
+import com.example.myapplication.model.AdminOrg
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 @Composable
-fun AdminKindergartenSelectScreen(
+fun AdminOrgSelectScreen(
     navController: NavController,
 ) {
     val sessionFlow = AdminManager.observeAdminSession()
     val sessionState = sessionFlow?.collectAsStateWithLifecycle(initialValue = null)
-    val kindergartens: List<AdminKindergarten> = (sessionState?.value?.adminKindergartens).orEmpty()
+    val orgs: List<AdminOrg> = (sessionState?.value?.adminOrgs).orEmpty()
 
     Column(
         modifier = Modifier
@@ -46,11 +46,11 @@ fun AdminKindergartenSelectScreen(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(kindergartens) { item ->
-                AdminKindergartenRow(
-                    kindergarten = item,
+            items(orgs) { item ->
+                AdminOrgRow(
+                    org = item,
                     onClick = {
-                        SelectedKindergartenStore.saveSelected(item)
+                        SelectedOrgStore.saveSelected(item)
                         // 모든 페이지를 다 지우고 메인으로 이동
                         navController.navigate(Screen.Main.route) {
                             popUpTo(0) { inclusive = true }
@@ -64,8 +64,8 @@ fun AdminKindergartenSelectScreen(
 }
 
 @Composable
-private fun AdminKindergartenRow(
-    kindergarten: AdminKindergarten,
+private fun AdminOrgRow(
+    org: AdminOrg,
     onClick: () -> Unit
 ) {
     Card(
@@ -78,18 +78,18 @@ private fun AdminKindergartenRow(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(text = kindergarten.kindergartenName, style = MaterialTheme.typography.titleMedium)
+            Text(text = org.orgName, style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "학급 수: ${kindergarten.classCount}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "학급 수: ${org.classCount}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun AdminKindergartenSelectPreview() {
+private fun AdminOrgSelectPreview() {
     MyApplicationTheme {
-        AdminKindergartenSelectScreen(rememberNavController())
+        AdminOrgSelectScreen(rememberNavController())
     }
 }
 

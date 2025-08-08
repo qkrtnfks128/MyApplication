@@ -11,10 +11,10 @@ data class AdminLoginRequest(
 data class AdminLoginResponse(
     val user_uuid: String,
     val status_code: Int,
-    val adminList: List<AdminKindergartenNetwork>
+    val adminList: List<AdminOrgNetwork>
 )
 
-data class AdminKindergartenNetwork(
+data class AdminOrgNetwork(
     val KINDERGARTEN_UUID: String,
     val KINDERGARTEN_NAME: String,
     val CLASS_CNT: Int,

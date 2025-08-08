@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.manager.AdminManager
+import com.example.myapplication.manager.SelectedOrgStore
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.utils.LogManager
@@ -29,12 +30,15 @@ fun SplashScreen(navController: NavController) {
         }.onSuccess { result ->
             result.onSuccess {
                 LogManager.auth("Splash", "auto_login", true)
-                navController.navigate(Screen.Main.route) {
+                val cached = SelectedOrgStore.getSelected()
+                val next = if (cached != null) Screen.Main.route else Screen.AdminOrgSelect.route
+                navController.navigate(next) {
                     popUpTo(Screen.Splash.route) { inclusive = true }
                     launchSingleTop = true
                 }
             }.onFailure {
                 LogManager.auth("Splash", "auto_login", false)
+                SelectedOrgStore.clear()
                 navController.navigate(Screen.Login.route) {
                     popUpTo(Screen.Splash.route) { inclusive = true }
                     launchSingleTop = true
@@ -42,6 +46,7 @@ fun SplashScreen(navController: NavController) {
             }
         }.onFailure {
             LogManager.error("Splash", "auto_login exception", it)
+            SelectedOrgStore.clear()
             navController.navigate(Screen.Login.route) {
                 popUpTo(Screen.Splash.route) { inclusive = true }
                 launchSingleTop = true

@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import android.util.Base64
+import com.example.myapplication.manager.SelectedOrgStore
 
 private const val TAG = "MyApplication"
 
@@ -33,6 +34,7 @@ class MyApplication : Application() {
         
         // AdminManager 초기화
         AdminManager.initialize(authController)
+        SelectedOrgStore.initialize(this)
         
     }
     // 자동 로그인은 SplashScreen에서 처리합니다.

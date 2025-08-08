@@ -4,14 +4,6 @@
 
 Manager 계층은 앱 전체에서 전역적으로 사용되는 상태와 기능을 관리하는 계층입니다. 싱글톤 패턴을 사용하여 앱 전체에서 일관된 접근을 제공합니다.
 
-## 구조 (Structure)
-
-```
-manager/
-├── UserManager.kt             # 전역 유저 상태 관리
-└── README.md                 # 이 파일
-```
-
 ## 주요 특징 (Key Features)
 
 ### 1. 전역 상태 관리
@@ -29,27 +21,6 @@ manager/
 
 - 복잡한 로직을 단순한 인터페이스로 제공
 - 앱 전체에서 일관된 API 제공
-
-## 사용 예시 (Usage Example)
-
-```kotlin
-object UserManager {
-    private var authController: AuthController? = null
-
-    fun initialize(authController: AuthController) {
-        this.authController = authController
-    }
-
-    suspend fun adminLogin(email: String, password: String): Result<User> {
-        return authController?.adminLogin(email, password)
-            ?: Result.failure(IllegalStateException("Not initialized"))
-    }
-
-    fun isLoggedIn(): Boolean {
-        return authController?.isLoggedIn() ?: false
-    }
-}
-```
 
 ## 네이밍 규칙 (Naming Convention)
 
