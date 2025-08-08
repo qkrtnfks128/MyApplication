@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.page.MainScreen
 import com.example.myapplication.page.history.BloodSugarHistoryScreen
+import com.example.myapplication.page.login.LoginScreen
 
 // AppNavigation에서 사용할 네비게이션 관련 함수와 화면을 정의합니다.
 // MainScreen: 메인 화면
@@ -26,10 +27,14 @@ fun AppNavigation() {
         composable(Screen.BloodSugarHistory.route) {
             BloodSugarHistoryScreen(navController)
         }
+        composable(Screen.Login.route) {
+            LoginScreen(navController)
+        }
     }
 }
 
 sealed class Screen(val route: String) {
     object Main : Screen("main")
     object BloodSugarHistory : Screen("bloodSugarHistory")
+    object Login : Screen("login")
 } 
