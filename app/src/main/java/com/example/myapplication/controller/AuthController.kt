@@ -13,8 +13,8 @@ class AuthController(
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
     
-    suspend fun login(email: String, password: String): Result<User> {
-        return authRepository.login(email, password).also { result ->
+    suspend fun adminLogin(email: String, password: String): Result<User> {
+        return authRepository.adminLogin(email, password).also { result ->
             result.onSuccess { user ->
                 _currentUser.value = user
             }
