@@ -77,6 +77,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.moshi.kotlin)
+//    implementation(files("libs/qnsdkX-2.8.7.jar"))
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

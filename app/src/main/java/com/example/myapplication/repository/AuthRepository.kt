@@ -27,7 +27,8 @@ class AuthRepositoryImpl(
 
     override suspend fun login(email: String, password: String): Result<User> {
         return try {
-            val response = authApi.login(LoginRequest(email = email, password = password))
+          // 자동로그인 1, 수동로그인 2
+            val response = authApi.login(LoginRequest(USER_TEL = email, USER_PW = password, AUTO_LOGIN = "2"))
             tokenStore.saveToken(response.token)
             val user = User(
                 id = response.id,
