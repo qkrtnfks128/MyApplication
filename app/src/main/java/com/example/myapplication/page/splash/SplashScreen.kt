@@ -17,6 +17,8 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.utils.LogManager
 import kotlinx.coroutines.delay
 import android.util.Base64
+import androidx.compose.runtime.CompositionLocalProvider
+import com.example.myapplication.navigation.LocalAppNavController
 
 @Composable
 fun SplashScreen(navController: NavController) {
@@ -64,8 +66,9 @@ fun SplashScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun SplashScreenPreview() {
-    MyApplicationTheme {
-        SplashScreen(rememberNavController())
+    val nav = rememberNavController()
+    CompositionLocalProvider(LocalAppNavController provides nav) {
+        SplashScreen(nav)
     }
 }
 

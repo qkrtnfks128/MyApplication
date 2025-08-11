@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
+import com.example.myapplication.navigation.LocalAppNavController
 import com.example.myapplication.navigation.Screen
 
 private const val ADMIN_LOGIN_SCREEN_TAG: String = "AdminLoginScreen"
@@ -152,6 +153,9 @@ fun AdminLoginScreen(
 @Composable
 fun AdminLoginScreenPreview() {
     MyApplicationTheme {
-        AdminLoginScreen(rememberNavController())
+        val nav = rememberNavController()
+        CompositionLocalProvider(LocalAppNavController provides nav) {
+            AdminLoginScreen(nav)
+        }
     }
 }

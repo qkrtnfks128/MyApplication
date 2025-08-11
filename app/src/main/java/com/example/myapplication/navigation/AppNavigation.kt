@@ -17,6 +17,8 @@ import com.example.myapplication.page.login.UserResultScreen
 import com.example.myapplication.model.UserListResult
 // no nav arguments used; passing complex object via SavedStateHandle
 import com.example.myapplication.page.login.PhoneAuthScreen
+import com.example.myapplication.page.measurement.MeasurementScreen
+import com.example.myapplication.page.measurement.MeasurementType
 
 // AppNavigation에서 사용할 네비게이션 관련 함수와 화면을 정의합니다.
 
@@ -34,10 +36,11 @@ fun AppNavigation() {
         }
     }
     
-    NavHost(
-        navController = navController,
-        startDestination = Screen.Splash.route
-    ) {
+    androidx.compose.runtime.CompositionLocalProvider(LocalAppNavController provides navController) {
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Splash.route
+        ) {
         composable(Screen.Splash.route) {
             SplashScreen(navController)
         }
@@ -68,10 +71,21 @@ fun AppNavigation() {
             }
 
             val result = current.get<UserListResult>(Screen.UserResult.KEY_RESULT)
-                ?: error("UserListResult is required")
+                ?: return@composable // <- 여기서 조용히 빠져나와 크래시 방지
 
             UserResultScreen(navController = navController, result = result)
         }
+        composable(Screen.Measurement.route + "/{type}") { backStackEntry ->
+            val typeStr = backStackEntry.arguments?.getString("type") ?: "BloodSugar"
+            val type = when (typeStr) {
+                "BloodPressure" -> MeasurementType.BloodPressure
+                "Weight" -> MeasurementType.Weight
+                else -> MeasurementType.BloodSugar
+            }
+            MeasurementScreen(navController = navController, type = type)
+        }
+    }
+        
     }
 }
 
@@ -86,4 +100,5 @@ sealed class Screen(val route: String) {
     object UserResult : Screen("userResult") {
         const val KEY_RESULT: String = "user_result"
     }
+    object Measurement : Screen("measurement")
 } 

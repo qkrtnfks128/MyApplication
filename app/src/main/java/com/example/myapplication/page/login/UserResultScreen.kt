@@ -8,6 +8,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -22,11 +25,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.remember
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.components.AppBar
 import com.example.myapplication.components.LeftButtonType
 import com.example.myapplication.model.UserListItem
 import com.example.myapplication.model.UserListResult
+import com.example.myapplication.navigation.LocalAppNavController
+import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.viewmodel.login.UserResultUiState
+import com.example.myapplication.viewmodel.login.UserResultViewModel
 
 
 @Composable
@@ -34,8 +48,9 @@ fun UserResultScreen(
     navController: NavController,
     result: UserListResult,
 ) {
-
-
+    val context = LocalContext.current
+    val vm: UserResultViewModel = viewModel()
+    val state = remember(result) { UserResultUiState(items = result.items) }
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -48,10 +63,40 @@ fun UserResultScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        when {
-            result.items.isEmpty() -> EmptyResultSection()
-            result.items.size == 1 -> SingleResultSection(item = result.items.first(), onSelect = { })
-            else -> MultiResultSection(items = result.items, onSelect = { })
+        when (state.items.size) {
+            0 -> EmptyResultSection()
+            1 -> SingleConfirmSection(
+                item = state.items.first(),
+                onNo = { navController.popBackStack() },
+                onYes = {
+                    val type = vm.saveUserDataAndGetMeasurementType(state.items.first())
+                    if (type != null) {
+                        navController.navigate(
+                            Screen.Measurement.route + "/" + type.name
+                        ){
+                          popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+    launchSingleTop = true
+    restoreState = false
+                        }
+                    } else {
+                        Toast.makeText(context, "측정 항목이 선택되지 않았습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
+            else -> MultiResultSection(items = state.items, onSelect = { 
+                val type = vm.saveUserDataAndGetMeasurementType(it)
+                if (type != null) {
+                    navController.navigate(
+                        Screen.Measurement.route + "/" + type.name
+                    ){
+                          popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+    launchSingleTop = true
+    restoreState = false
+                    }
+                } else {
+                    Toast.makeText(context, "측정 항목이 선택되지 않았습니다.", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
     }
 }
@@ -71,23 +116,56 @@ private fun EmptyResultSection() {
 }
 
 @Composable
-private fun SingleResultSection(item: UserListItem, onSelect: (UserListItem) -> Unit) {
+private fun SingleConfirmSection(item: UserListItem, onNo: () -> Unit, onYes: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // 이미지 영역 플레이스홀더
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp),
+            shape = RoundedCornerShape(24.dp),
+            color = Color(0xFFEFF3F8)
+        ) {}
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         Text(
-            text = "다음 정보가 맞는지 확인해 주세요.",
-            style = MaterialTheme.typography.headlineSmall
+            text = "${item.name} 어르신이 맞으신가요?",
+            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold)
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        UserRow(
-            item = item,
-            isHighlighted = true,
-            onClick = { onSelect(item) }
-        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            OutlinedButton(
+                onClick = { onNo() },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(96.dp),
+                shape = RoundedCornerShape(24.dp)
+            ) {
+                Text(text = "아니오", color = Color(0xFF1976D2), style = MaterialTheme.typography.headlineMedium)
+            }
+
+            Button(
+                onClick = { onYes() },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(96.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
+            ) {
+                Text(text = "네", color = Color.White, style = MaterialTheme.typography.headlineMedium)
+            }
+        }
     }
 }
 
@@ -149,7 +227,9 @@ private fun UserRow(item: UserListItem, isHighlighted: Boolean, onClick: () -> U
 private fun UserResultScreenPreviewEmpty() {
     val nav = rememberNavController()
     val result = UserListResult(statusCode = 0, items = emptyList())
-    MyApplicationTheme { UserResultScreen(navController = nav, result = result) }
+    CompositionLocalProvider(LocalAppNavController provides nav) {
+        UserResultScreen(navController = nav, result = result)
+    }
 }
 
 @Preview(showBackground = true)
@@ -168,7 +248,9 @@ private fun UserResultScreenPreviewSingle() {
             )
         )
     )
-    MyApplicationTheme { UserResultScreen(navController = nav, result = result) }
+    CompositionLocalProvider(LocalAppNavController provides nav) {
+        UserResultScreen(navController = nav, result = result)
+    }
 }
 
 @Preview(showBackground = true)
@@ -182,7 +264,9 @@ private fun UserResultScreenPreviewMulti() {
             UserListItem("박철수", "CVID-002", "", "01033334444", "1960년 03월 01일")
         )
     )
-    MyApplicationTheme { UserResultScreen(navController = nav, result = result) }
+    CompositionLocalProvider(LocalAppNavController provides nav) {
+        UserResultScreen(navController = nav, result = result)
+    }
 }
 
 

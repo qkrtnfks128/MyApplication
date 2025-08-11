@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +27,11 @@ import com.example.myapplication.components.LeftButtonType
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.manager.AdminManager
+import com.example.myapplication.manager.SelectedMeasurementStore
+import com.example.myapplication.manager.SelectedOrgStore
+import com.example.myapplication.manager.SelectedUserStore
+import com.example.myapplication.navigation.LocalAppNavController
+import com.example.myapplication.page.measurement.MeasurementType
 import com.example.myapplication.utils.LogManager
 
 
@@ -44,8 +50,25 @@ fun MainScreen(navController: NavController) {
     ) {
         // AppBar
         AppBar(
-            leftButtonType = LeftButtonType.NONE,
+            leftButtonType = if (SelectedUserStore.get() != null) LeftButtonType.LOGOUT else LeftButtonType.NONE,
+            
+            
             centerWidget = {
+                if (SelectedUserStore.get() != null) {
+                    Text(
+                        text = "${SelectedUserStore.get()?.name} 어르신",
+                        style = TextStyle(
+                            fontSize = 40.sp,
+                            lineHeight = 52.sp,
+                            fontFamily = FontFamily(Font(R.font.pretendard)),
+                            fontWeight = FontWeight(600),
+                            color = Color.Black,
+                            textAlign = TextAlign.Center,
+                        ),
+                    )
+
+                }else{
+                    
                 Box(
                     modifier = Modifier
                         .clickable { /* 클릭 시 동작 추가 가능 */
@@ -56,7 +79,7 @@ fun MainScreen(navController: NavController) {
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = com.example.myapplication.manager.SelectedOrgStore.getSelected()?.orgName
+                        text = SelectedOrgStore.getSelected()?.orgName
                             ?: "오늘의 건강을 확인해볼까요?",
                         style = TextStyle(
                             fontSize = 40.sp,
@@ -69,99 +92,71 @@ fun MainScreen(navController: NavController) {
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+                }
+
             }
         )
         
-        // 3개의 측정 버튼을 가로로 배치
+        // 기존 3개 버튼 영역 교체
+        val items = listOf(
+            MeasurementType.BloodSugar,
+            MeasurementType.BloodPressure,
+            MeasurementType.Weight
+        )
+
         Row(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(start = 40.dp, top = 10.dp, end = 40.dp, bottom = 40.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            modifier = Modifier
+                .fillMaxWidth().fillMaxHeight()
+                .padding(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(21.dp)
         ) {
-            // 혈당 측정 버튼 (빨간색)
-            MeasurementButton(
-                title = "혈당",
-                subtitle = "측정",
-                backgroundColor = Color(0xFFE53E3E), // 빨간색
-                onClick = {
-                    LogManager.userAction(MAIN_SCREEN_TAG, "혈당 측정 버튼 클릭")
-                    // navController.navigate(Screen.BloodSugarHistory.route)
-                navController.navigate(Screen.UserAuth.route)
-                },
-                modifier = Modifier.weight(1f)
-            )
-            
-            Spacer(modifier = Modifier.width(21.dp))
-            
-            // 혈압 측정 버튼 (주황색)
-            MeasurementButton(
-                title = "혈압",
-                subtitle = "측정",
-                backgroundColor = Color(0xFFED8936), // 주황색
-                onClick = { /* 혈압 측정 로직 */ 
-                    LogManager.userAction(MAIN_SCREEN_TAG, "혈압 측정 버튼 클릭")
-                    // if (!com.example.myapplication.manager.AdminManager.isLoggedIn()) {
-                    //     navController.navigate(Screen.Login.route)
-                    //     return@MeasurementButton
-                    // }
-                },
-                modifier = Modifier.weight(1f)
-            )
-            
-            Spacer(modifier = Modifier.width(21.dp))
-            
-            // 체중 측정 버튼 (초록색)
-            MeasurementButton(
-                title = "체중",
-                subtitle = "측정",
-                backgroundColor = Color(0xFF38A169), // 초록색
-                onClick = { /* 체중 측정 로직 */ 
-                    LogManager.userAction(MAIN_SCREEN_TAG, "체중 측정 버튼 클릭")
-                   },
-                modifier = Modifier.weight(1f)
-            )
+            items.forEach { type ->
+                MeasurementButton(
+                    type = type,
+                    navController = navController,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
+    }
+}
+
+// 헬퍼: 타입 저장 후 페이지 이동
+private fun navigateToMeasurement(navController: NavController, type: MeasurementType) {
+    SelectedMeasurementStore.save(type)
+    val hasUser = SelectedUserStore.get() != null
+    if (hasUser) {
+        navController.navigate(Screen.Measurement.route + "/${type.name}")
+    } else {
+        navController.navigate(Screen.UserAuth.route)
     }
 }
 
 @Composable
 fun MeasurementButton(
-    title: String,
-    subtitle: String,
-    backgroundColor: Color,
-    onClick: () -> Unit,
+    type: MeasurementType,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxHeight()
-            .clip(RoundedCornerShape(16.dp))
-            .background(backgroundColor)
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
+    val (title: String, backgroundColor: Color) = when (type) {
+        MeasurementType.BloodSugar -> "혈당" to Color(0xFFE53E3E)
+        MeasurementType.BloodPressure -> "혈압" to Color(0xFFED8936)
+        MeasurementType.Weight -> "체중" to Color(0xFF38A169)
+    }
+
+    Button(
+        onClick = {
+            LogManager.userAction(MAIN_SCREEN_TAG, "$title 측정 버튼 클릭")
+            navigateToMeasurement(navController, type)
+        },
+        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
+        shape = RoundedCornerShape(24.dp)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = title,
-                fontSize = 80.sp,
-                lineHeight = 104.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard)),
-                fontWeight = FontWeight(600),
-                color = Color(0xFFFFFFFF),
-                textAlign = TextAlign.Center,
-            )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = title, fontSize = 80.sp, lineHeight = 104.sp, color = Color.White)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = subtitle,
-                fontSize = 80.sp,
-                lineHeight = 104.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard)),
-                fontWeight = FontWeight(600),
-                color = Color(0xFFFFFFFF),
-                textAlign = TextAlign.Center,
-            )
+            Text(text = "측정", fontSize = 80.sp, lineHeight = 104.sp, color = Color.White)
         }
     }
 }
@@ -170,6 +165,9 @@ fun MeasurementButton(
 @Composable
 fun MainScreenPreview() {
     MyApplicationTheme {
-        MainScreen(rememberNavController())
+        val nav = rememberNavController()
+        CompositionLocalProvider(LocalAppNavController provides nav) {
+            MainScreen(nav)
+        }
     }
 } 

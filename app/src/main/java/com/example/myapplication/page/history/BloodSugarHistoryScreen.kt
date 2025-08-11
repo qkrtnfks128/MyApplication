@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.NavController
 import com.example.myapplication.model.BloodSugarData
 import com.example.myapplication.model.BloodSugarStatus
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import com.example.myapplication.R
+import com.example.myapplication.navigation.LocalAppNavController
 
 
 // BloodSugarHistoryScreen은 혈당 기록 내역 화면으로, 혈당 기록 내역을 표시합니다.
@@ -264,6 +266,9 @@ private fun createTestData(): List<BloodSugarData> {
 @Composable
 fun BloodSugarHistoryScreenPreview() {
     MyApplicationTheme {
-        BloodSugarHistoryScreen(rememberNavController())
+        val nav = rememberNavController()
+        CompositionLocalProvider(LocalAppNavController provides nav) {
+            BloodSugarHistoryScreen(nav)
+        }
     }
 } 

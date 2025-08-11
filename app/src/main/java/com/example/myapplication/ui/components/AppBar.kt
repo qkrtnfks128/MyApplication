@@ -28,7 +28,13 @@ import com.example.myapplication.R
 import androidx.compose.ui.tooling.preview.Preview
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.example.myapplication.navigation.LocalAppNavController
+import com.example.myapplication.navigation.Screen
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.rememberNavController
 
 enum class LeftButtonType {
     NONE, HOME, BACK, LOGOUT
@@ -45,10 +51,11 @@ data class ButtonConfig(
 fun AppBar(
     leftButtonType: LeftButtonType = LeftButtonType.NONE,
     centerWidget: @Composable (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current  // Context 가져오기
-    
+    val nav = LocalAppNavController.current 
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -66,14 +73,18 @@ fun AppBar(
             // 왼쪽 버튼 섹션
             if (leftButtonType != LeftButtonType.NONE) {
                 val leftButtonConfig = getLeftButtonConfig(leftButtonType)
-                val leftButtonClickHandler = getLeftButtonClickHandler(leftButtonType, context)  // Context 전달
+                val leftButtonClickHandler = getLeftButtonClickHandler(
+                    leftButtonType,
+                    context,
+                    nav
+                )
                 AppBarButton(
                     buttonConfig = leftButtonConfig,
-                    onClick = leftButtonClickHandler,   
+                    onClick = leftButtonClickHandler,
                     modifier = Modifier.align(Alignment.CenterStart)
                 )
             }
-            
+
             // 우측 종료 버튼 섹션
             val rightButtonConfig = ButtonConfig(
                 icon = Icons.Default.PowerSettingsNew,
@@ -139,7 +150,7 @@ private fun getLeftButtonConfig(buttonType: LeftButtonType): ButtonConfig {
     return when (buttonType) {
         LeftButtonType.HOME -> ButtonConfig(
             icon = Icons.Default.Home,
-            text = "홈"
+            text = "처음으로"
         )
         LeftButtonType.BACK -> ButtonConfig(
             icon = Icons.Default.ArrowBack,
@@ -158,19 +169,20 @@ private fun getLeftButtonConfig(buttonType: LeftButtonType): ButtonConfig {
 
 private fun getLeftButtonClickHandler(
     buttonType: LeftButtonType,
-    context: Context  // Context 파라미터 추가
+    context: Context,
+    nav: NavController
 ): (() -> Unit)? {
     return when (buttonType) {
-        LeftButtonType.HOME -> { {
+        LeftButtonType.HOME -> {
+           
             {
-                Toast.makeText(
-                    context,  // 전달받은 Context 사용
-                    "홈버튼을 눌렀습니다!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                nav.navigate(Screen.Main.route) {
+                    popUpTo(nav.graph.id) { inclusive = true } // 그래프 루트까지 완전 삭제
+                    launchSingleTop = true
+                    restoreState = false
+                }
             }
-            
-        } }
+        }
         LeftButtonType.BACK -> {
             {
             // 뒤로가기 버튼 클릭 시 현재 액티비티를 종료하여 이전 화면으로 이동합니다.
@@ -198,14 +210,8 @@ private fun getButtonTextStyle(textColor: Color): TextStyle {
 @Preview(showBackground = true)
 @Composable
 fun AppBarPreview() {
-    AppBar(
-        leftButtonType = LeftButtonType.BACK,
-        centerWidget = {
-            Text(
-                text = "김영희 어르신",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    )
+    val nav = rememberNavController()
+    CompositionLocalProvider(LocalAppNavController provides nav) {
+        AppBar(leftButtonType = LeftButtonType.BACK)
+    }
 }

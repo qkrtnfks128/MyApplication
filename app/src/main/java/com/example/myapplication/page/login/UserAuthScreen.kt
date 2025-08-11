@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +37,7 @@ import com.example.myapplication.components.LeftButtonType
 import com.example.myapplication.navigation.Screen
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.navigation.LocalAppNavController
 
 private val AUTH_BLUE: Color = Color(0xFF0B5DB8)
 private val AUTH_BLUE_BORDER: Color = Color(0xFF0A4C96)
@@ -98,7 +100,10 @@ private fun AuthOptionCard(modifier: Modifier = Modifier, background: Color, bor
 @Preview(showBackground = true)
 @Composable
 fun UserAuthScreenPreview() {
-    MyApplicationTheme { UserAuthScreen(rememberNavController()) }
+    val nav = rememberNavController()
+    CompositionLocalProvider(LocalAppNavController provides nav) {
+        UserAuthScreen(nav)
+    }
 }
 
 

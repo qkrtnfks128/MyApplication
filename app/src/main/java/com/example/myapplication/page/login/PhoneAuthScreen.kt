@@ -28,7 +28,10 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import android.widget.Toast
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
+import com.example.myapplication.manager.SelectedOrgStore
+import com.example.myapplication.navigation.LocalAppNavController
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.repository.SmartCareRepositoryFactory
 import com.example.myapplication.network.NetworkConfig
@@ -120,7 +123,7 @@ fun PhoneAuthScreen(navController: NavController) {
                             return@ActionButton
                         }
                         scope.launch {
-                            val centerUuid: String = com.example.myapplication.manager.SelectedOrgStore.getSelected()?.orgUuid ?: ""
+                            val centerUuid: String = SelectedOrgStore.getSelected()?.orgUuid ?: ""
                             val result = repo.getUserListUsingPhoneNumber(
                                 customerCode = NetworkConfig.CUSTOMER_CODE,
                                 centerUuid = centerUuid,
@@ -176,7 +179,10 @@ private fun ActionButton(text: String, color: Color, textColor: Color = Color.Bl
 @Preview(showBackground = true)
 @Composable
 private fun PhoneAuthScreenPreview() {
-    MyApplicationTheme { PhoneAuthScreen(rememberNavController()) }
+    val nav = rememberNavController()
+    CompositionLocalProvider(LocalAppNavController provides nav) {
+        PhoneAuthScreen(nav)
+    }
 }
 
 

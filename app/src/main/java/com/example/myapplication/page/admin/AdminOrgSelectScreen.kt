@@ -8,6 +8,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.manager.SelectedOrgStore
 import com.example.myapplication.model.AdminOrg
+import com.example.myapplication.navigation.LocalAppNavController
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
@@ -89,7 +91,10 @@ private fun AdminOrgRow(
 @Composable
 private fun AdminOrgSelectPreview() {
     MyApplicationTheme {
-        AdminOrgSelectScreen(rememberNavController())
+        val nav = rememberNavController()
+        CompositionLocalProvider(LocalAppNavController provides nav) {
+            AdminOrgSelectScreen(nav)
+        }
     }
 }
 
