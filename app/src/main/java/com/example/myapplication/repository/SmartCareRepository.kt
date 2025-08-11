@@ -35,7 +35,6 @@ class SmartCareRepositoryImpl(
                         UserListResult(
                             statusCode = body.status_code,
                             items = items,
-                            status = body.status
                         )
                     )
                 } else {

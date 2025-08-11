@@ -7,6 +7,7 @@ object NetworkConfig {
     const val HEADER_AUTHORIZATION: String = "Authorization"
     const val HEADER_CONTENT_TYPE: String = "Content-Type"
     const val MEDIA_TYPE_JSON: String = "application/json"
+    const val CUSTOMER_CODE: String = "namhae"
 
     // Environment base URLs
     private const val PROD_BASE_URL: String = "http://35.241.46.53/"

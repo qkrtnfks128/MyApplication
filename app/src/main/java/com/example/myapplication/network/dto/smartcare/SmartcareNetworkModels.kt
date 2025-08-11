@@ -3,7 +3,6 @@ package com.example.myapplication.network.dto.smartcare
 data class UserListUsingPhoneNumberResponse(
     val status_code: Int,
     val data: List<UserListUsingPhoneNumber>,
-    val status: String
 )
 
 data class UserListUsingPhoneNumber(

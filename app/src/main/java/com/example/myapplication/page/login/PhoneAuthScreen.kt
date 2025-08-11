@@ -25,6 +25,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.components.AppBar
 import com.example.myapplication.components.LeftButtonType
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import com.example.myapplication.navigation.Screen
+import com.example.myapplication.repository.SmartCareRepositoryFactory
+import com.example.myapplication.network.NetworkConfig
 
 @Composable
 fun PhoneAuthScreen(navController: NavController) {
@@ -65,6 +72,9 @@ fun PhoneAuthScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(24.dp))
 
         val keyHeight: androidx.compose.ui.unit.Dp = 88.dp
+        val scope = rememberCoroutineScope()
+        val context = LocalContext.current
+        val repo = remember { SmartCareRepositoryFactory.create() }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,7 +107,38 @@ fun PhoneAuthScreen(navController: NavController) {
                             if (idx in 0..3) digits[idx] = label
                         }
                     }
-                    ActionButton(text = "입력완료", color = Color(0xFF1976D2), textColor = Color.White, height = keyHeight, modifier = Modifier.weight(1f)) {
+                    ActionButton(
+                        text = "입력완료",
+                        color = Color(0xFF1976D2),
+                        textColor = Color.White,
+                        height = keyHeight,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        val phoneNumber: String = digits.joinToString("")
+                        if (phoneNumber.length != 4) {
+                            Toast.makeText(context, "4자리를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                            return@ActionButton
+                        }
+                        scope.launch {
+                            val centerUuid: String = com.example.myapplication.manager.SelectedOrgStore.getSelected()?.orgUuid ?: ""
+                            val result = repo.getUserListUsingPhoneNumber(
+                                customerCode = NetworkConfig.CUSTOMER_CODE,
+                                centerUuid = centerUuid,
+                                number = phoneNumber
+                            )
+                            result.fold(
+                                onSuccess = { r ->
+                                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                                        Screen.UserResult.KEY_RESULT,
+                                        r
+                                    )
+                                    navController.navigate(Screen.UserResult.route)
+                                },
+                                onFailure = { e ->
+                                    Toast.makeText(context, e.message ?: "요청 실패", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
                     }
                 }
             }

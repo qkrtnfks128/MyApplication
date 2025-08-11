@@ -13,6 +13,9 @@ import com.example.myapplication.page.splash.SplashScreen
 import com.example.myapplication.utils.LogManager
 import com.example.myapplication.page.admin.AdminOrgSelectScreen
 import com.example.myapplication.page.login.UserAuthScreen
+import com.example.myapplication.page.login.UserResultScreen
+import com.example.myapplication.model.UserListResult
+// no nav arguments used; passing complex object via SavedStateHandle
 import com.example.myapplication.page.login.PhoneAuthScreen
 
 // AppNavigation에서 사용할 네비게이션 관련 함수와 화면을 정의합니다.
@@ -53,8 +56,21 @@ fun AppNavigation() {
         composable(Screen.UserAuth.route) {
             UserAuthScreen(navController)
         }
-        composable(Screen.PhoneAuth.route) {
-            PhoneAuthScreen(navController)
+        composable(Screen.PhoneAuth.route) { PhoneAuthScreen(navController) }
+        composable(Screen.UserResult.route) { backStackEntry ->
+            val current = backStackEntry.savedStateHandle
+            val prev = navController.previousBackStackEntry?.savedStateHandle
+
+            // first time: move data from previous entry to current entry
+            prev?.get<UserListResult>(Screen.UserResult.KEY_RESULT)?.let { moved ->
+                current.set(Screen.UserResult.KEY_RESULT, moved)
+                prev.remove<UserListResult>(Screen.UserResult.KEY_RESULT)
+            }
+
+            val result = current.get<UserListResult>(Screen.UserResult.KEY_RESULT)
+                ?: error("UserListResult is required")
+
+            UserResultScreen(navController = navController, result = result)
         }
     }
 }
@@ -67,4 +83,7 @@ sealed class Screen(val route: String) {
     object AdminOrgSelect : Screen("adminOrgSelect")
     object UserAuth : Screen("userAuth")
     object PhoneAuth : Screen("phoneAuth")
+    object UserResult : Screen("userResult") {
+        const val KEY_RESULT: String = "user_result"
+    }
 } 
