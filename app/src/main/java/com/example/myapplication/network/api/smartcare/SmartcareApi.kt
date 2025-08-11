@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface SmartcareApi {
-    // 사용자 인증 - 전화번호로 목록 조회
+    // 사용자 인증 - 전화번호로 목록 조회 - api 변경예정
     @GET("smartcare/{customerCode}/check/{centerUuid}/{number}")
     suspend fun requestUserListUsingPhoneNumber(
         @Path("customerCode") customerCode: String,

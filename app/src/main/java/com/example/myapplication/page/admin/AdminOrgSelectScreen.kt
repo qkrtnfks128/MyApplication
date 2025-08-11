@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.components.AppBar
+import com.example.myapplication.components.LeftButtonType
 import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.manager.SelectedOrgStore
 import com.example.myapplication.model.AdminOrg
@@ -38,9 +40,14 @@ fun AdminOrgSelectScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = "기관 선택",
-            style = MaterialTheme.typography.headlineSmall
+        AppBar(
+            leftButtonType = if (SelectedOrgStore.getSelected() != null) LeftButtonType.BACK else LeftButtonType.NONE,
+            centerWidget = {
+                Text(
+                    text = "경로당 선택",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
         )
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -48,7 +55,7 @@ fun AdminOrgSelectScreen(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(orgs) { item ->
+            items(orgs.sortedBy { it.orgName }) { item ->
                 AdminOrgRow(
                     org = item,
                     onClick = {
