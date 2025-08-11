@@ -4,9 +4,9 @@ import com.example.myapplication.model.Admin
 import com.example.myapplication.model.AdminSession
 import com.example.myapplication.model.AdminOrg
 import com.example.myapplication.network.RetrofitProvider
-import com.example.myapplication.network.api.AuthApi
-import com.example.myapplication.network.dto.AdminLoginRequest
-import com.example.myapplication.network.dto.AdminLoginResponse
+import com.example.myapplication.network.api.admin.AdminAuthApi
+import com.example.myapplication.network.dto.admin.AdminLoginRequest
+import com.example.myapplication.network.dto.admin.AdminLoginResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +25,7 @@ interface AuthRepository {
 }
 
 class AuthRepositoryImpl(
-    private val authApi: AuthApi,
+    private val authApi: AdminAuthApi,
     private val tokenStore: TokenStore
 ) : AuthRepository {
     private val currentAdminState: MutableStateFlow<Admin?> = MutableStateFlow(null)
@@ -79,7 +79,6 @@ class AuthRepositoryImpl(
 
     override suspend fun logout(): Result<Unit> {
         return try {
-            authApi.logout()
             tokenStore.clearToken()
             currentAdminState.update { null }
             adminSessionState.update { null }
@@ -132,7 +131,7 @@ object AuthRepositoryFactory {
         val tokenStore: TokenStore = InMemoryTokenStore()
         val client: OkHttpClient = RetrofitProvider.createOkHttpClient(tokenProvider = tokenStore::getToken)
         val retrofit = RetrofitProvider.createRetrofit(client = client)
-        val api = retrofit.create(AuthApi::class.java)
+        val api = retrofit.create(AdminAuthApi::class.java)
         return AuthRepositoryImpl(api, tokenStore)
     }
 }

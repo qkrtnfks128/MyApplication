@@ -1,6 +1,4 @@
-package com.example.myapplication.network.dto
-
-// 관리자 로그인 요청/응답 형식
+package com.example.myapplication.network.dto.admin
 
 data class AdminLoginRequest(
     val USER_TEL: String,

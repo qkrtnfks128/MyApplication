@@ -50,7 +50,7 @@ fun AdminLoginScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("이메일") },
+            label = { Text("전화번호") },
             modifier = Modifier.fillMaxWidth()
         )
         

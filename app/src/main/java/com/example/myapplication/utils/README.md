@@ -26,7 +26,7 @@ class MainScreen {
         // 사용자 액션 로그
         LogManager.userAction(TAG, "혈당 측정 버튼 클릭")
 
-        // 네비게이션 로그
+        // 네비게이션 로그 - 자동
         LogManager.navigation(TAG, "MainScreen", "BloodSugarHistory")
 
         // 인증 로그

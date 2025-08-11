@@ -29,9 +29,9 @@ import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.utils.LogManager
 
 
-
 // MainScreen은 메인 화면으로, 혈당, 혈압, 체중 측정 버튼을 포함합니다.
 // 각 버튼은 클릭 시 유저로그인화면 또는 해당 측정 화면으로 이동합니다.
+
 private const val MAIN_SCREEN_TAG: String = "MainScreen"
 @Composable
 fun MainScreen(navController: NavController) {
@@ -84,8 +84,8 @@ fun MainScreen(navController: NavController) {
                 backgroundColor = Color(0xFFE53E3E), // 빨간색
                 onClick = {
                     LogManager.userAction(MAIN_SCREEN_TAG, "혈당 측정 버튼 클릭")
-                    LogManager.navigation(MAIN_SCREEN_TAG, "MainScreen", "BloodSugarHistory")
-                    navController.navigate(Screen.BloodSugarHistory.route)
+                    // navController.navigate(Screen.BloodSugarHistory.route)
+                navController.navigate(Screen.UserAuth.route)
                 },
                 modifier = Modifier.weight(1f)
             )
@@ -100,7 +100,6 @@ fun MainScreen(navController: NavController) {
                 onClick = { /* 혈압 측정 로직 */ 
                     LogManager.userAction(MAIN_SCREEN_TAG, "혈압 측정 버튼 클릭")
                     // if (!com.example.myapplication.manager.AdminManager.isLoggedIn()) {
-                    //     LogManager.navigation(MAIN_SCREEN_TAG, "MainScreen", "Login")
                     //     navController.navigate(Screen.Login.route)
                     //     return@MeasurementButton
                     // }
