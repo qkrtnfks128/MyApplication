@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.moshi.kotlin)
 //    implementation(files("libs/qnsdkX-2.8.7.jar"))
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(libs.androidx.lifecycle.process)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

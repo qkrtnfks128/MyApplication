@@ -35,6 +35,11 @@ import com.example.myapplication.navigation.LocalAppNavController
 import com.example.myapplication.navigation.Screen
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.manager.AdminManager
+import com.example.myapplication.manager.SelectedOrgStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 enum class LeftButtonType {
     NONE, HOME, BACK, LOGOUT
@@ -96,6 +101,8 @@ fun AppBar(
                 onClick = {
                     // 종료 버튼 클릭 시 동작 구현
                     (context as? android.app.Activity)?.finish()
+                // 유저정보 삭제 기능 추가
+                    SelectedOrgStore.clear()
 
                 },
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -190,7 +197,16 @@ private fun getLeftButtonClickHandler(
        
             }
         }
-        LeftButtonType.LOGOUT -> { {} }
+        LeftButtonType.LOGOUT -> { {
+            CoroutineScope(Dispatchers.Main).launch {
+                AdminManager.logout()
+            }
+        nav.navigate(Screen.UserAuth.route) {
+            popUpTo(nav.graph.id) { inclusive = true }
+            launchSingleTop = true
+            restoreState = false
+        }
+        } }
         LeftButtonType.NONE -> null
     }
 }

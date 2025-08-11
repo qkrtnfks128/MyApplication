@@ -74,7 +74,7 @@ fun UserResultScreen(
                         navController.navigate(
                             Screen.Measurement.route + "/" + type.name
                         ){
-                          popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                          popUpTo(navController.graph.id) { inclusive = true }
     launchSingleTop = true
     restoreState = false
                         }
@@ -89,7 +89,7 @@ fun UserResultScreen(
                     navController.navigate(
                         Screen.Measurement.route + "/" + type.name
                     ){
-                          popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                          popUpTo(navController.graph.id) { inclusive = true }
     launchSingleTop = true
     restoreState = false
                     }
