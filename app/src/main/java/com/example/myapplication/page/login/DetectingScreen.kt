@@ -47,6 +47,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.viewmodel.login.DetectingViewModel
 import com.example.myapplication.manager.SelectedOrgStore
+import com.example.myapplication.model.UserListItem
+import com.example.myapplication.model.UserListResult
+import com.example.myapplication.navigation.Screen
 import com.example.myapplication.utils.WCV
 import com.example.myapplication.utils.LogManager
 
@@ -121,7 +124,11 @@ fun DetectingScreen(
     LaunchedEffect(isChecking) {
         if (isChecking) {
             statusText = "얼굴 인식 완료!"
-            navController.popBackStack()
+            navController.currentBackStackEntry?.savedStateHandle?.set(
+                Screen.UserResult.KEY_RESULT,
+                UserListResult(items = listOf(UserListItem(cvid = "24820", name = "박수란")), statusCode = 200,)
+            )
+            navController.navigate(Screen.UserResult.route)
         }
     }
 

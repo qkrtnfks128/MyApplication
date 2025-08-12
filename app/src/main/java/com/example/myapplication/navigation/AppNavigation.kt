@@ -20,6 +20,7 @@ import com.example.myapplication.page.login.PhoneAuthScreen
 import com.example.myapplication.page.measurement.MeasurementScreen
 import com.example.myapplication.page.measurement.MeasurementType
 import com.example.myapplication.page.login.DetectingScreen
+ 
 
 // AppNavigation에서 사용할 네비게이션 관련 함수와 화면을 정의합니다.
 
@@ -88,6 +89,7 @@ fun AppNavigation() {
         composable(Screen.Detecting.route) {
             DetectingScreen(navController = navController)
         }
+        
     }
         
     }
@@ -106,4 +108,5 @@ sealed class Screen(val route: String) {
     }
     object Measurement : Screen("measurement")
     object Detecting : Screen("detecting")
+    
 } 

@@ -12,6 +12,8 @@ import com.example.myapplication.utils.ConvertUtils
 import com.onethefull.wonderful_cv_library.CV_Package.FaceDetectionAsyncTask
 import com.onethefull.wonderful_cv_library.CV_Package.WonderfulCV
 import timber.log.Timber
+import android.os.Handler
+import android.os.Looper
  
 class DetectingViewModel  : ViewModel() {
 
@@ -62,6 +64,14 @@ class DetectingViewModel  : ViewModel() {
                     }
                 }
             }
+
+            //test
+            _checking.value = true
+            
+            Handler(Looper.getMainLooper()).postDelayed({
+                _checking.value = false
+            }, 1000)
+            // return
 
             faceDetectionTask.setConnectionInfo(
                 wonderfulCV.token,

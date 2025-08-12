@@ -216,7 +216,7 @@ private fun UserRow(item: UserListItem, isHighlighted: Boolean, onClick: () -> U
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text(text = item.name, style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold))
-                Text(text = item.registrationDate, style = MaterialTheme.typography.titleLarge)
+
             }
         }
     }

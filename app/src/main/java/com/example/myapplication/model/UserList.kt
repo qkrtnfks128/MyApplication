@@ -5,9 +5,9 @@ import java.io.Serializable
 data class UserListItem(
     val name: String,
     val cvid: String,
-    val imageUrl: String,
-    val parentTel: String,
-    val registrationDate: String
+    val imageUrl: String? = null,
+    val parentTel: String? = null,
+    val registrationDate: String? = null
 ) : Serializable
 
 data class UserListResult(
