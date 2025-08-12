@@ -65,7 +65,9 @@ fun UserAuthScreen(navController: NavController) {
                     border = AUTH_BLUE_BORDER,
                     icon = { Icon(imageVector = Icons.Filled.TagFaces, contentDescription = "face", tint = Color.White, modifier = Modifier.size(64.dp)) },
                     label = "얼굴인식",
-                    onClick = { }
+                    onClick = { 
+                        navController.navigate(Screen.Detecting.route)
+                    }
                 )
             }
             Box(modifier = Modifier.weight(1f)) {

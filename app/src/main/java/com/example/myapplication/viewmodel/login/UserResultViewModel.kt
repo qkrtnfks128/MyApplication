@@ -18,7 +18,7 @@ data class UserResultUiState(
 )
 
 
-class UserResultViewModel(
+class UserResultViewModel (
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 

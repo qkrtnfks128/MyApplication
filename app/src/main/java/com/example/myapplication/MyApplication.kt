@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.app.Application
+import android.content.Context
 import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.manager.SelectedOrgStore
 import com.example.myapplication.manager.SelectedUserStore
@@ -18,6 +19,7 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
         initializeDependencies()
         LogManager.info(TAG, "MyApplication created")
         ProcessLifecycleOwner.get().lifecycle.addObserver(
@@ -30,6 +32,13 @@ class MyApplication : Application() {
             )
         )
     }
+    companion object {
+      lateinit var instance: MyApplication
+      fun applicationContext(): Context {
+          return instance!!.applicationContext
+      }
+      lateinit var context: Context
+  }
 
     // 선택: 메모리 신호(홈키 등)도 함께 잡고 싶다면
 //override fun onTrimMemory(level: Int) {

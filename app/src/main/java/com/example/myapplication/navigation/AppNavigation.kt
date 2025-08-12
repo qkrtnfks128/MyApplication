@@ -19,6 +19,7 @@ import com.example.myapplication.model.UserListResult
 import com.example.myapplication.page.login.PhoneAuthScreen
 import com.example.myapplication.page.measurement.MeasurementScreen
 import com.example.myapplication.page.measurement.MeasurementType
+import com.example.myapplication.page.login.DetectingScreen
 
 // AppNavigation에서 사용할 네비게이션 관련 함수와 화면을 정의합니다.
 
@@ -84,6 +85,9 @@ fun AppNavigation() {
             }
             MeasurementScreen(navController = navController, type = type)
         }
+        composable(Screen.Detecting.route) {
+            DetectingScreen(navController = navController)
+        }
     }
         
     }
@@ -101,4 +105,5 @@ sealed class Screen(val route: String) {
         const val KEY_RESULT: String = "user_result"
     }
     object Measurement : Screen("measurement")
+    object Detecting : Screen("detecting")
 } 
