@@ -27,10 +27,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.components.AppBar
 import com.example.myapplication.components.LeftButtonType
@@ -41,6 +44,13 @@ import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.viewmodel.login.UserResultUiState
 import com.example.myapplication.viewmodel.login.UserResultViewModel
+import com.example.myapplication.ui.theme.CustomColor
+import com.example.myapplication.ui.theme.Stroke
+import com.example.myapplication.ui.theme.b3
+import com.example.myapplication.ui.theme.h1
+import com.example.myapplication.R
+import com.example.myapplication.ui.theme.b4
+import com.example.myapplication.navigation.LocalAppNavController
 
 
 @Composable
@@ -58,7 +68,7 @@ fun UserResultScreen(
     ) {
         AppBar(
             leftButtonType = LeftButtonType.BACK,
-            centerWidget = { Text(text = "사용자 인증", style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)) }
+            centerWidget = { Text(text = "사용자 인증", style = MaterialTheme.typography.h1) }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -67,128 +77,184 @@ fun UserResultScreen(
             0 -> EmptyResultSection()
             1 -> SingleConfirmSection(
                 item = state.items.first(),
-                onNo = { navController.popBackStack() },
-                onYes = {
-                    val type = vm.saveUserDataAndGetMeasurementType(state.items.first())
-                    if (type != null) {
-                        navController.navigate(
-                            Screen.Measurement.route + "/" + type.name
-                        ){
-                          popUpTo(navController.graph.id) { inclusive = true }
-    launchSingleTop = true
-    restoreState = false
-                        }
-                    } else {
-                        Toast.makeText(context, "측정 항목이 선택되지 않았습니다.", Toast.LENGTH_SHORT).show()
-                    }
-                }
             )
-            else -> MultiResultSection(items = state.items, onSelect = { 
-                val type = vm.saveUserDataAndGetMeasurementType(it)
-                if (type != null) {
-                    navController.navigate(
-                        Screen.Measurement.route + "/" + type.name
-                    ){
-                          popUpTo(navController.graph.id) { inclusive = true }
-    launchSingleTop = true
-    restoreState = false
-                    }
-                } else {
-                    Toast.makeText(context, "측정 항목이 선택되지 않았습니다.", Toast.LENGTH_SHORT).show()
-                }
-            })
+            else -> MultiResultSection(items = state.items,)
         }
     }
 }
 
+
+// 일치번호 없음
 @Composable
 private fun EmptyResultSection() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "일치하는 사용자가 없습니다.", style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "휴대전화 번호를 다시 확인해 주세요.", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-    }
-}
-
-@Composable
-private fun SingleConfirmSection(item: UserListItem, onNo: () -> Unit, onYes: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 24.dp),
+            .padding(horizontal = 94.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 이미지 영역 플레이스홀더
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp),
-            shape = RoundedCornerShape(24.dp),
-            color = Color(0xFFEFF3F8)
-        ) {}
-
-        Spacer(modifier = Modifier.height(32.dp))
+        Image(
+            painter = painterResource(id = R.drawable.x),
+            contentDescription = "일치번호 없음",
+        )
+        Spacer(modifier = Modifier.height(30.dp))
 
         Text(
-            text = "${item.name} 어르신이 맞으신가요?",
-            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold)
+            text = "입력하신 번호와 일치하는 분이 없어요.\n다시 한번 확인해 주세요!",
+            style = MaterialTheme.typography.b4
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
+            horizontalArrangement = Arrangement.spacedBy(36.dp)
         ) {
-            OutlinedButton(
-                onClick = { onNo() },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(96.dp),
-                shape = RoundedCornerShape(24.dp)
-            ) {
-                Text(text = "아니오", color = Color(0xFF1976D2), style = MaterialTheme.typography.headlineMedium)
-            }
+            // OutlinedButton(
+            //     border = BorderStroke(6.dp, CustomColor.blue),
+            //     onClick = { onNo() },
+            //     modifier = Modifier
+            //         .weight(1f)
+            //         .height(118.dp),
+            //     shape = RoundedCornerShape(30.dp)
+            // ) {
+            //     Text(text = "아니오", color = CustomColor.blue, style = MaterialTheme.typography.b4)
+            // }
 
-            Button(
-                onClick = { onYes() },
+            val nav  =  LocalAppNavController.current
+            OutlinedButton(
+                border = BorderStroke(6.dp, Stroke.black20),
+                onClick = {
+                    nav.popBackStack()
+                 },
                 modifier = Modifier
                     .weight(1f)
-                    .height(96.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
+                    .height(118.dp),
+                shape = RoundedCornerShape(30.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = CustomColor.blue)
             ) {
-                Text(text = "네", color = Color.White, style = MaterialTheme.typography.headlineMedium)
+                Text(text = "다시 입력하기", color = CustomColor.white, style = MaterialTheme.typography.b4)
             }
         }
     }
 }
 
+
+// 한 사용자 결과 표시
 @Composable
-private fun MultiResultSection(items: List<UserListItem>, onSelect: (UserListItem) -> Unit) {
+private fun SingleConfirmSection(item: UserListItem) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 94.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // 이미지 영역 플레이스홀더
+        Image(
+            painter = painterResource(id = R.drawable.welcome),
+            contentDescription = "환영 이미지",
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "${item.name} 어르신이 맞으신가요?",
+            style = MaterialTheme.typography.b3
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        val nav  =  LocalAppNavController.current
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(36.dp)
+        ) {
+            OutlinedButton(
+                border = BorderStroke(6.dp, CustomColor.blue),
+                onClick = { nav.popBackStack() },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(118.dp),
+                shape = RoundedCornerShape(30.dp)
+            ) {
+                Text(text = "아니오", color = CustomColor.blue, style = MaterialTheme.typography.b4)
+            }
+
+
+            val vm: UserResultViewModel = viewModel()
+            OutlinedButton(
+                border = BorderStroke(6.dp, Stroke.black20),
+                onClick = {
+                    val type = vm.saveUserDataAndGetMeasurementType(item)
+                    if (type != null) {
+                        nav.navigate(
+                            Screen.Measurement.route + "/" + type.name
+                        ){
+                          popUpTo(nav.graph.id) { inclusive = true }
+    launchSingleTop = true
+    restoreState = false
+                        }
+                    } else {
+                        nav.navigate(Screen.Main.route){
+                            popUpTo(nav.graph.id) { inclusive = true }
+                            launchSingleTop = true
+                            restoreState = false
+                        }
+                    }
+                 },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(118.dp),
+                shape = RoundedCornerShape(30.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = CustomColor.blue)
+            ) {
+                Text(text = "네", color = CustomColor.white, style = MaterialTheme.typography.b4)
+            }
+        }
+    }
+}
+
+
+// 여러 사용자 결과 표시
+@Composable
+private fun MultiResultSection(items: List<UserListItem>,) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "같은 번호로 등록된 분이 여러 명 있어요.\n본인을 선택해 주세요",
-            style = MaterialTheme.typography.headlineSmall,
-            lineHeight = 36.sp
+            text = "본인을 선택해 주세요",
+            style = MaterialTheme.typography.b4,
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(19.dp))
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+
             items(items) { item ->
-                UserRow(item = item, isHighlighted = false) { onSelect(item) }
+               @Composable {
+                val vm: UserResultViewModel = viewModel()
+                val nav  =  LocalAppNavController.current
+                UserRow(item = item, isHighlighted = false) {
+                    val type = vm.saveUserDataAndGetMeasurementType(item)
+                    if (type != null) {
+                        nav.navigate(
+                            Screen.Measurement.route + "/" + type.name
+                        ){
+                          popUpTo(nav.graph.id) { inclusive = true }
+    launchSingleTop = true
+    restoreState = false
+                        }
+                    } else {
+                        nav.navigate(Screen.Main.route){
+                            popUpTo(nav.graph.id) { inclusive = true }
+                            launchSingleTop = true
+                            restoreState = false
+                        }
+                    }
+                 }}
             }
         }
     }
@@ -215,7 +281,7 @@ private fun UserRow(item: UserListItem, isHighlighted: Boolean, onClick: () -> U
             contentAlignment = Alignment.CenterStart
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(text = item.name, style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold))
+                Text(text = item.name, style = MaterialTheme.typography.b3)
 
             }
         }

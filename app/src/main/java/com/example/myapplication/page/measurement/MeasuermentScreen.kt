@@ -25,6 +25,7 @@ import com.example.myapplication.navigation.LocalAppNavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.model.MeasurementType
 import com.example.myapplication.model.displayName
+import com.example.myapplication.ui.theme.h1
 
 @Composable
 fun MeasurementScreen(
@@ -41,7 +42,7 @@ fun MeasurementScreen(
         AppBar(
             leftButtonType = LeftButtonType.HOME,
             centerWidget = {
-                Text(text = "$userName 어르신", style = MaterialTheme.typography.headlineSmall)
+                Text(text = "$userName 어르신", style = MaterialTheme.typography.h1)
             }
         )
 
@@ -86,20 +87,7 @@ fun MeasurementScreen(
             ) {}
         }
 
-        Spacer(modifier = Modifier.weight(1f))
 
-        val actionLabel: String = remember(type) { "시작" }
-        Button(
-            onClick = { /* start measurement */ },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 24.dp)
-                .height(72.dp),
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            Text(text = actionLabel, color = Color.White, style = MaterialTheme.typography.titleLarge)
-        }
     }
 }
 

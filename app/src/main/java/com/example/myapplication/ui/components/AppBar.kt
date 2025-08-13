@@ -46,9 +46,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.foundation.border 
-import com.example.myapplication.ui.theme.Stroke 
+import androidx.compose.foundation.border
+import com.example.myapplication.ui.theme.Stroke
 import androidx.compose.foundation.layout.PaddingValues
+import com.example.myapplication.manager.SelectedUserStore
 
 enum class LeftButtonType {
     NONE, HOME, BACK, LOGOUT
@@ -68,7 +69,7 @@ fun AppBar(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current  // Context 가져오기
-    val nav = LocalAppNavController.current 
+    val nav = LocalAppNavController.current
 
     Surface(
         // color = CustomColor.bg,
@@ -84,7 +85,7 @@ fun AppBar(
         ) {
             // 가운데 위젯 - 항상 중앙에 위치
             centerWidget?.invoke()
-            
+
             // 왼쪽 버튼 섹션
             if (leftButtonType != LeftButtonType.NONE) {
                 val leftButtonConfig = getLeftButtonConfig(leftButtonType)
@@ -112,7 +113,8 @@ fun AppBar(
                     // 종료 버튼 클릭 시 동작 구현
                     (context as? android.app.Activity)?.finish()
                 // 유저정보 삭제 기능 추가
-                    SelectedOrgStore.clear()
+                    SelectedUserStore.clear()
+                    // 측정 프로세스 초기화
 
                 },
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -130,7 +132,7 @@ private fun AppBarButton(
     Button(
         onClick = { onClick?.invoke() },
         modifier = modifier,
-         
+
         shape = RoundedCornerShape(100.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = CustomColor.white,
@@ -197,7 +199,7 @@ private fun getLeftButtonClickHandler(
 ): (() -> Unit)? {
     return when (buttonType) {
         LeftButtonType.HOME -> {
-           
+
             {
                 nav.navigate(Screen.Main.route) {
                     popUpTo(nav.graph.id) { inclusive = true } // 그래프 루트까지 완전 삭제
@@ -210,7 +212,7 @@ private fun getLeftButtonClickHandler(
             {
             // 뒤로가기 버튼 클릭 시 현재 액티비티를 종료하여 이전 화면으로 이동합니다.
             (context as? android.app.Activity)?.onBackPressed()
-       
+
             }
         }
         LeftButtonType.LOGOUT -> { {

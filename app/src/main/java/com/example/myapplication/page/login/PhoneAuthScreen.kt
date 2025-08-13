@@ -54,9 +54,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.style.TextAlign
+import com.example.myapplication.ui.components.CustomToast
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
+import com.example.myapplication.R
 
 @Composable
 fun PhoneAuthScreen(navController: NavController) {
+    // 로딩중 표시
+    val isLoading = remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -131,7 +141,7 @@ fun PhoneAuthScreen(navController: NavController) {
         val repo = remember { SmartCareRepositoryFactory.create() }
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth().fillMaxHeight()
                 .background(CustomColor.gray04, )
                 .padding(vertical = 24.dp, horizontal = 16.dp)
         ) {
@@ -147,17 +157,35 @@ fun PhoneAuthScreen(navController: NavController) {
                             activeIndex = if (next != 4) next else 3
                         }
                     }
-                    ActionButton(text = "지우기", color = CustomColor.white, textColor = CustomColor.gray01, ) {
-                        if (digits[activeIndex].isEmpty()) {
-                            if (activeIndex > 0) {
+                        ActionButton(
+                            color = CustomColor.white,
+                            content = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource( R.drawable.ic_backspace),
+                                    contentDescription = "지우기 아이콘",
+                                    tint = CustomColor.gray01
+                                )
+
+                                Text(text = "지우기", style = MaterialTheme.typography.b5,color = CustomColor.gray01)
+                                }
+                            },
+                        ) {
+                            if (digits[activeIndex].isEmpty()) {
+                                if (activeIndex > 0) {
+                                    digits[activeIndex] = ""
+                                    activeIndex -= 1
+                                }
+                            } else {
                                 digits[activeIndex] = ""
-                                activeIndex -= 1
                             }
-                        } else {
-                            digits[activeIndex] = ""
                         }
+
                     }
-                }
+
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -172,15 +200,21 @@ fun PhoneAuthScreen(navController: NavController) {
                         }
                     }
                     ActionButton(
-                        text = "입력완료",
-                        color = CustomColor.blue,
-                        textColor = CustomColor.white,
+
+                        content = {
+
+                                Text(text = "입력완료", style = MaterialTheme.typography.b5,color = CustomColor.white)
+
+                        },
+                        color = if (isLoading.value) CustomColor.gray01 else CustomColor.blue,
                     ) {
                         val phoneNumber: String = digits.joinToString("")
                         if (phoneNumber.length != 4) {
-                            Toast.makeText(context, "4자리를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                            CustomToast.show(context, "4자리를 입력해주세요.")
                             return@ActionButton
                         }
+
+                        isLoading.value = true
                         scope.launch {
                             val centerUuid: String = SelectedOrgStore.getSelected()?.orgUuid ?: ""
                             val result = repo.getUserListUsingPhoneNumber(
@@ -200,6 +234,7 @@ fun PhoneAuthScreen(navController: NavController) {
                                     Toast.makeText(context, e.message ?: "요청을 실패했습니다.", Toast.LENGTH_SHORT).show()
                                 }
                             )
+                            isLoading.value = false
                         }
                     }
                 }
@@ -207,6 +242,7 @@ fun PhoneAuthScreen(navController: NavController) {
         }
     }
 }
+
 
 @Composable
 private fun KeyButton(label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
@@ -222,15 +258,27 @@ private fun KeyButton(label: String, modifier: Modifier = Modifier, onClick: () 
     }
 }
 
+
 @Composable
-private fun ActionButton(text: String, color: Color, textColor: Color = CustomColor.black, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun ActionButton(
+    content: @Composable () -> Unit,
+    color: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Surface(
-        modifier = modifier.height(98.dp).width(194.dp).clickable { onClick() },
+        modifier = modifier
+            .height(98.dp)
+            .width(194.dp)
+            .clickable { onClick() },
         color = color,
         shape = RoundedCornerShape(10.dp)
     ) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = text, color = textColor, style = MaterialTheme.typography.b5)
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            content()
         }
     }
 }

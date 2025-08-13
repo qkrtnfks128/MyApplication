@@ -20,6 +20,11 @@ import android.util.Base64
 import androidx.compose.runtime.CompositionLocalProvider
 import com.example.myapplication.navigation.LocalAppNavController
 
+
+// SplashScreen은 앱 실행 시 최초로 보여지는 화면입니다.
+// 자동 로그인을 시도하며, 성공 시 메인 또는 기관 선택 화면으로 이동하고
+// 실패 시 관리자 로그인 화면으로 이동합니다.
+
 @Composable
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {

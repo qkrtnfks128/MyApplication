@@ -21,14 +21,14 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val TAG = "MainActivity"
     }
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
+
         // 앱 시작 시 로그인 상태 확인
         checkLoginStatus()
-        
+
         setContent {
             MyApplicationTheme {
                 Surface(color = MaterialTheme.colorScheme.background) {
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    
+
     private fun checkLoginStatus() {
         lifecycleScope.launch {
             val currentAdmin = AdminManager.getCurrentAdmin()

@@ -48,11 +48,6 @@ import com.example.myapplication.ui.theme.b4
 import com.example.myapplication.ui.theme.h1
 import com.example.myapplication.R
 
-private val AUTH_BLUE: Color = Color(0xFF0B5DB8)
-private val AUTH_BLUE_BORDER: Color = Color(0xFF0A4C96)
-private val AUTH_GREEN: Color = Color(0xFF17A34A)
-private val AUTH_GREEN_BORDER: Color = Color(0xFF12833C)
-private val CARD_SHAPE: RoundedCornerShape = RoundedCornerShape(28.dp)
 
 @Composable
 fun UserAuthStartScreen(navController: NavController) {
@@ -70,7 +65,7 @@ fun UserAuthStartScreen(navController: NavController) {
                     background = YC_Color.blue,
                     imageResId = R.drawable.face_recognition,
                     label = "얼굴인식",
-                    onClick = { 
+                    onClick = {
                         navController.navigate(Screen.Detecting.route)
                     }
                 )
@@ -101,8 +96,8 @@ private fun AuthOptionCard(
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-     
-          
+
+
             Box(
                 modifier = Modifier
                     .width(310.dp)
@@ -129,7 +124,7 @@ private fun AuthOptionCard(
                     )
                 }
             }
-        
+
     }
 }
 

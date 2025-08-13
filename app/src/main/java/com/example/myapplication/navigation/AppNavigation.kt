@@ -1,7 +1,15 @@
 package com.example.myapplication.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,7 +28,7 @@ import com.example.myapplication.page.login.PhoneAuthScreen
 import com.example.myapplication.page.measurement.MeasurementScreen
 import com.example.myapplication.model.MeasurementType
 import com.example.myapplication.page.login.DetectingScreen
- 
+
 
 // AppNavigation에서 사용할 네비게이션 관련 함수와 화면을 정의합니다.
 
@@ -28,6 +36,34 @@ import com.example.myapplication.page.login.DetectingScreen
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+
+    var shouldResetToMain by remember { mutableStateOf(false) }
+    val appLifecycle: Lifecycle = ProcessLifecycleOwner.get().lifecycle
+
+    DisposableEffect(appLifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_STOP -> shouldResetToMain = true
+                Lifecycle.Event.ON_START -> {
+                    if (shouldResetToMain) {
+                        // 포그라운드 복귀 시 메인으로 이동
+                        navController.navigate(Screen.Main.route) {
+                            popUpTo(navController.graph.id) { inclusive = true }
+                            launchSingleTop = true
+                            restoreState = false
+                        }
+                        shouldResetToMain = false
+                    }
+                }
+
+                else -> Unit
+            }
+        }
+        appLifecycle.addObserver(observer)
+        onDispose { appLifecycle.removeObserver(observer) }
+    }
+
+
     LaunchedEffect(navController) {
         var previousRoute: String? = null
         navController.currentBackStackEntryFlow.collect { entry ->
@@ -37,7 +73,7 @@ fun AppNavigation() {
             previousRoute = currentRoute
         }
     }
-    
+
     androidx.compose.runtime.CompositionLocalProvider(LocalAppNavController provides navController) {
         NavHost(
             navController = navController,
@@ -89,9 +125,9 @@ fun AppNavigation() {
         composable(Screen.Detecting.route) {
             DetectingScreen(navController = navController)
         }
-        
+
     }
-        
+
     }
 }
 
@@ -108,5 +144,5 @@ sealed class Screen(val route: String) {
     }
     object Measurement : Screen("measurement")
     object Detecting : Screen("detecting")
-    
-} 
+
+}
