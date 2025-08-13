@@ -12,7 +12,7 @@ import com.example.myapplication.page.login.AdminLoginScreen
 import com.example.myapplication.page.splash.SplashScreen
 import com.example.myapplication.utils.LogManager
 import com.example.myapplication.page.admin.AdminOrgSelectScreen
-import com.example.myapplication.page.login.UserAuthScreen
+import com.example.myapplication.page.login.UserAuthStartScreen
 import com.example.myapplication.page.login.UserResultScreen
 import com.example.myapplication.model.UserListResult
 // no nav arguments used; passing complex object via SavedStateHandle
@@ -59,7 +59,7 @@ fun AppNavigation() {
             AdminOrgSelectScreen(navController)
         }
         composable(Screen.UserAuth.route) {
-            UserAuthScreen(navController)
+            UserAuthStartScreen(navController)
         }
         composable(Screen.PhoneAuth.route) { PhoneAuthScreen(navController) }
         composable(Screen.UserResult.route) { backStackEntry ->

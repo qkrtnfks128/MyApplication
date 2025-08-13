@@ -17,18 +17,24 @@ import kotlinx.coroutines.flow.asStateFlow
 object SelectedMeasurementStore {
     @Volatile private var selected: MeasurementType? = null
     private val _selectedFlow: MutableStateFlow<MeasurementType?> = MutableStateFlow(null)
+//혈당 - 식전 식후 선택 상태(optional)
+    private val _beforeAfterFlow: MutableStateFlow<Boolean?> = MutableStateFlow(null)
 
     fun initialize() {
         selected = null
-        _selectedFlow.value = null
+        _selectedFlow.value = null  
+        _beforeAfterFlow.value = null
     }
 
-    fun save(type: MeasurementType) {
+    fun save(type: MeasurementType, beforeAfter: Boolean? = null) {
         selected = type
         _selectedFlow.value = type
+        _beforeAfterFlow.value = beforeAfter
     }
 
     fun get(): MeasurementType? = selected
+
+    fun getBeforeAfter(): Boolean? = _beforeAfterFlow.value
 
     fun clear() {
         selected = null
@@ -36,6 +42,7 @@ object SelectedMeasurementStore {
     }
 
     fun observe(): StateFlow<MeasurementType?> = _selectedFlow.asStateFlow()
+    fun observeBeforeAfter(): StateFlow<Boolean?> = _beforeAfterFlow.asStateFlow()
 }
 
 

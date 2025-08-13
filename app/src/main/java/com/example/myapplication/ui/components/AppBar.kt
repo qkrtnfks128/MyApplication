@@ -48,6 +48,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.foundation.border 
 import com.example.myapplication.ui.theme.Stroke 
+import androidx.compose.foundation.layout.PaddingValues
 
 enum class LeftButtonType {
     NONE, HOME, BACK, LOGOUT
@@ -126,18 +127,23 @@ private fun AppBarButton(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            // .shadow(
-            //     elevation = ShadowTokens().header.elevation,
-            //     spotColor = ShadowTokens().header.color,
-            //     ambientColor = ShadowTokens().header.color
-            // )
-            .clip(RoundedCornerShape(size = 100.dp))
-            .background(color = Color.White)
-            .border(1.dp, Stroke.black20, RoundedCornerShape(100.dp))
-            .clickable { onClick?.invoke() },
-        contentAlignment = Alignment.Center
+    Button(
+        onClick = { onClick?.invoke() },
+        modifier = modifier,
+         
+        shape = RoundedCornerShape(100.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = CustomColor.white,
+            contentColor = CustomColor.black
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = ShadowTokens().header.elevation,
+            pressedElevation = 0.dp,
+            focusedElevation = 0.dp,
+            hoveredElevation = 0.dp,
+            disabledElevation = 0.dp
+        ),
+        contentPadding = PaddingValues(0.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),

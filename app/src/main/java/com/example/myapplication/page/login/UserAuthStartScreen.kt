@@ -38,6 +38,15 @@ import com.example.myapplication.navigation.Screen
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.navigation.LocalAppNavController
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.ui.res.painterResource
+import com.example.myapplication.ui.theme.YC_Color
+import com.example.myapplication.ui.theme.CustomColor
+import com.example.myapplication.ui.theme.Stroke
+import com.example.myapplication.ui.theme.b4
+import com.example.myapplication.ui.theme.h1
+import com.example.myapplication.R
 
 private val AUTH_BLUE: Color = Color(0xFF0B5DB8)
 private val AUTH_BLUE_BORDER: Color = Color(0xFF0A4C96)
@@ -46,65 +55,90 @@ private val AUTH_GREEN_BORDER: Color = Color(0xFF12833C)
 private val CARD_SHAPE: RoundedCornerShape = RoundedCornerShape(28.dp)
 
 @Composable
-fun UserAuthScreen(navController: NavController) {
+fun UserAuthStartScreen(navController: NavController) {
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
         AppBar(
             leftButtonType = LeftButtonType.BACK,
             centerWidget = {
-                Text(text = "사용자 인증", style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
+                Text(text = "사용자 인증", style = MaterialTheme.typography.h1)
             }
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "인증방법을 선택해주세요", style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(12.dp))
-        Row(modifier = Modifier.fillMaxWidth().padding(start = 40.dp, top = 10.dp, end = 40.dp, bottom = 40.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-            Box(modifier = Modifier.weight(1f)) {
+        Text(text = "인증방법을 선택해주세요", style = MaterialTheme.typography.b4)
+        Spacer(modifier = Modifier.height(35.dp))
+        Row(modifier = Modifier.padding(start = 40.dp, top = 10.dp, end = 40.dp, bottom = 40.dp), horizontalArrangement = Arrangement.Center,verticalAlignment = Alignment.CenterVertically) {
                 AuthOptionCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    background = AUTH_BLUE,
-                    border = AUTH_BLUE_BORDER,
-                    icon = { Icon(imageVector = Icons.Filled.TagFaces, contentDescription = "face", tint = Color.White, modifier = Modifier.size(64.dp)) },
+                    background = YC_Color.blue,
+                    imageResId = R.drawable.face_recognition,
                     label = "얼굴인식",
                     onClick = { 
                         navController.navigate(Screen.Detecting.route)
                     }
                 )
-            }
-            Box(modifier = Modifier.weight(1f)) {
+            Spacer(modifier = Modifier.width(30.dp))
                 AuthOptionCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    background = AUTH_GREEN,
-                    border = AUTH_GREEN_BORDER,
-                    icon = { Icon(imageVector = Icons.Filled.Dialpad, contentDescription = "phone", tint = Color.White, modifier = Modifier.size(64.dp)) },
+                    background = YC_Color.green,
+                    imageResId = R.drawable.phone_number,
                     label = "전화번호",
                     onClick = { navController.navigate(Screen.PhoneAuth.route) }
                 )
-            }
+
         }
     }
 }
 
 @Composable
-private fun AuthOptionCard(modifier: Modifier = Modifier, background: Color, border: Color, icon: @Composable () -> Unit, label: String, onClick: () -> Unit) {
-    Card(modifier = modifier.height(360.dp).clickable { onClick() }, shape = CARD_SHAPE, colors = CardDefaults.cardColors(containerColor = Color.Transparent), elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)) {
-        Box(modifier = Modifier.fillMaxSize().background(border, shape = CARD_SHAPE).padding(10.dp)) {
-            Box(modifier = Modifier.fillMaxSize().background(background, shape = CARD_SHAPE).padding(24.dp)) {
-                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    icon()
+private fun AuthOptionCard(
+    modifier: Modifier = Modifier,
+    background: Color,
+    imageResId: Int,
+    label: String,
+    onClick: () -> Unit
+) {
+    val cardShape = RoundedCornerShape(30.dp)
+    Card(
+        modifier = modifier.clickable { onClick() },
+        shape = cardShape,
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+     
+          
+            Box(
+                modifier = Modifier
+                    .width(310.dp)
+                    .border(10.dp, Stroke.black20, shape = cardShape)
+                    .height(310.dp)
+                    .background(background, shape = cardShape)
+                    .padding(24.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(imageResId),
+                        contentDescription = label,
+                        modifier = Modifier.size(96.dp)
+                    )
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text(text = label, color = Color.White, style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
+                    Text(
+                        text = label,
+                        color = CustomColor.white,
+                        style = MaterialTheme.typography.b4
+                    )
                 }
             }
-        }
+        
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun UserAuthScreenPreview() {
+fun UserAuthStartScreenPreview() {
     val nav = rememberNavController()
     CompositionLocalProvider(LocalAppNavController provides nav) {
-        UserAuthScreen(nav)
+        UserAuthStartScreen(nav)
     }
 }
 

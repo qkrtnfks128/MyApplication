@@ -42,8 +42,15 @@ import com.example.myapplication.model.displayName
 import com.example.myapplication.utils.LogManager
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.myapplication.components.dialog.BigDialog
 import com.example.myapplication.ui.theme.Stroke
 import com.example.myapplication.ui.theme.b1
+import androidx.compose.ui.draw.shadow
+import com.example.myapplication.ui.theme.ShadowTokens
 
 
 // MainScreen은 메인 화면으로, 혈당, 혈압, 체중 측정 버튼을 포함합니다.
@@ -140,50 +147,123 @@ private fun navigateToMeasurement(navController: NavController, type: Measuremen
         navController.navigate(Screen.UserAuth.route)
     }
 }
-
 @Composable
 fun MeasurementButton(
-    type: MeasurementType,
-    navController: NavController,
-    modifier: Modifier = Modifier
+	type: MeasurementType,
+	navController: NavController,
+	modifier: Modifier = Modifier
 ) {
-    val title: String = type.displayName()
+	val title: String = type.displayName()
 
- 
-    val shape = RoundedCornerShape(24.dp)
-    val bgPainter = when (type) {
-        MeasurementType.BloodSugar -> painterResource(R.drawable.blood_sugar)
-        MeasurementType.BloodPressure -> painterResource(R.drawable.blood_pressure)
-        MeasurementType.Weight -> painterResource(R.drawable.weight)
-    }
+	val shape = RoundedCornerShape(24.dp)
+	val bgPainter = when (type) {
+		MeasurementType.BloodSugar -> painterResource(R.drawable.blood_sugar)
+		MeasurementType.BloodPressure -> painterResource(R.drawable.blood_pressure)
+		MeasurementType.Weight -> painterResource(R.drawable.weight)
+	}
 
-    Button(
-        onClick = {
-            LogManager.userAction(MAIN_SCREEN_TAG, "$title 측정 버튼 클릭")
+	var showTimingDialog by remember { mutableStateOf(false) }
 
-            // 혈당 측정일 때 다이얼로그로 측정시기(식전/식후) 선택, 아니면 기존 플로우
-            if (type == MeasurementType.BloodSugar) {
-              
-            }else{
-
-                navigateToMeasurement(navController, type)
-            }
-        },
+	Button(
+		onClick = {
+			LogManager.userAction(MAIN_SCREEN_TAG, "$title 측정 버튼 클릭")
+			if (type == MeasurementType.BloodSugar) {
+				showTimingDialog = true
+			} else {
+				navigateToMeasurement(navController, type)
+			}
+		},
 		modifier = modifier
 			.fillMaxHeight()
+			.shadow(ShadowTokens().default.elevation, shape = shape)
 			.clip(shape)
 			.paint(bgPainter, contentScale = ContentScale.Crop)
 			.border(10.dp, Stroke.black20, shape),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-        shape = shape,
-        contentPadding = PaddingValues(0.dp)
-    ) {
-        Text(
-            text = "$title\n측정",
-            style = MaterialTheme.typography.b1,
-            color = CustomColor.white
-        )
-    }
+		colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+		shape = shape,
+		contentPadding = PaddingValues(0.dp)
+	) {
+		Text(
+			text = "$title\n측정",
+			style = MaterialTheme.typography.bodyLarge,
+			color = CustomColor.white,
+			textAlign = TextAlign.Center
+		)
+	}
+
+        //혈당 측정시기 선택 다이얼로그
+	if (showTimingDialog) {
+		BigDialog(
+			title = "언제 ${title}을 측정하시는 건가요?",
+			onDismiss = { showTimingDialog = false },
+            content = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            SelectedMeasurementStore.save(type, true)
+                            showTimingDialog = false
+                            navigateToMeasurement(navController, type)
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(96.dp)
+                            .border(
+                                width = 10.dp,
+                                color = Stroke.black20,
+                                shape = RoundedCornerShape(30.dp)
+                            )
+                            .clip(RoundedCornerShape(30.dp)),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = CustomColor.pink,
+                            contentColor = CustomColor.white
+                        ),
+                        shape = RoundedCornerShape(30.dp),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(
+                            text = "식사전",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = CustomColor.white
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        onClick = {
+                            SelectedMeasurementStore.save(type, false)
+                            showTimingDialog = false
+                            navigateToMeasurement(navController, type)
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(96.dp)
+                            .border(
+                                width = 10.dp,
+                                color = Stroke.black20,
+                                shape = RoundedCornerShape(30.dp)
+                            )
+                            .clip(RoundedCornerShape(30.dp)),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = CustomColor.purple,
+                            contentColor = CustomColor.white
+                        ),
+                        shape = RoundedCornerShape(30.dp),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(
+                            text = "식사후",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = CustomColor.white
+                        )
+                    }
+                }
+            }
+		)
+	}
 }
 
 @Preview(showBackground = true)
