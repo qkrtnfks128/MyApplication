@@ -28,6 +28,7 @@ import com.example.myapplication.R
 import androidx.compose.ui.tooling.preview.Preview
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -37,9 +38,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.manager.SelectedOrgStore
+import com.example.myapplication.ui.theme.CustomColor
+import com.example.myapplication.ui.theme.ShadowTokens
+import com.example.myapplication.ui.theme.h3
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.foundation.border 
+import com.example.myapplication.ui.theme.Stroke 
 
 enum class LeftButtonType {
     NONE, HOME, BACK, LOGOUT
@@ -62,15 +70,16 @@ fun AppBar(
     val nav = LocalAppNavController.current 
 
     Surface(
+        // color = CustomColor.bg,
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(start = 40.dp, top = 24.dp, end = 40.dp, bottom = 24.dp),
-        color = MaterialTheme.colorScheme.surface,
+
     ) {
         Box(
             modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             // 가운데 위젯 - 항상 중앙에 위치
             centerWidget?.invoke()
@@ -94,7 +103,7 @@ fun AppBar(
             val rightButtonConfig = ButtonConfig(
                 icon = Icons.Default.PowerSettingsNew,
                 text = "종료",
-                iconTint = Color.Red
+                iconTint = CustomColor.red
             )
             AppBarButton(
                 buttonConfig = rightButtonConfig,
@@ -119,13 +128,14 @@ private fun AppBarButton(
 ) {
     Box(
         modifier = modifier
-            .shadow(
-                elevation = 12.dp,
-                spotColor = Color(0x26000000),
-                ambientColor = Color(0x26000000)
-            )
+            // .shadow(
+            //     elevation = ShadowTokens().header.elevation,
+            //     spotColor = ShadowTokens().header.color,
+            //     ambientColor = ShadowTokens().header.color
+            // )
             .clip(RoundedCornerShape(size = 100.dp))
             .background(color = Color.White)
+            .border(1.dp, Stroke.black20, RoundedCornerShape(100.dp))
             .clickable { onClick?.invoke() },
         contentAlignment = Alignment.Center
     ) {
@@ -147,25 +157,25 @@ private fun AppBarButton(
             )
             Text(
                 text = buttonConfig.text,
-                style = getButtonTextStyle(buttonConfig.textColor)
+                style = MaterialTheme.typography.h3
             )
         }
     }
 }
-
+@Composable
 private fun getLeftButtonConfig(buttonType: LeftButtonType): ButtonConfig {
     return when (buttonType) {
         LeftButtonType.HOME -> ButtonConfig(
-            icon = Icons.Default.Home,
+            icon = Icons.Default.ArrowBack,
             text = "처음으로"
         )
         LeftButtonType.BACK -> ButtonConfig(
-            icon = Icons.Default.ArrowBack,
+            icon = ImageVector.vectorResource(R.drawable.ic_double_arrow_left),
             text = "뒤로가기"
         )
         LeftButtonType.LOGOUT -> ButtonConfig(
-            icon = Icons.Default.Logout,
-            text = "로그아웃"
+            icon = Icons.Default.Person,
+            text = "사용자변경"
         )
         LeftButtonType.NONE -> ButtonConfig(
             icon = Icons.Default.Home,
@@ -212,16 +222,7 @@ private fun getLeftButtonClickHandler(
 }
 
 
-private fun getButtonTextStyle(textColor: Color): TextStyle {
-    return TextStyle(
-        fontSize = 40.sp,
-        lineHeight = 52.sp,
-        fontFamily = FontFamily(Font(R.font.pretendard)),
-        fontWeight = FontWeight(600),
-        color = textColor,
-        textAlign = TextAlign.Center,
-    )
-}
+
 
 @Preview(showBackground = true)
 @Composable

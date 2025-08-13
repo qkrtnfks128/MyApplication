@@ -5,6 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.navigation.AppNavigation
 import com.example.myapplication.ui.theme.MyApplicationTheme
@@ -28,7 +31,9 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             MyApplicationTheme {
-                AppNavigation()
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    AppNavigation()
+                }
             }
         }
     }

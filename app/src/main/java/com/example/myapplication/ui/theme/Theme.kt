@@ -16,15 +16,17 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = YC_Color.green,
+    secondary = YC_Color.blue,
+    tertiary = YC_Color.green,
+    background = CustomColor.bg
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = YC_Color.green,
+    secondary = YC_Color.blue,
+    tertiary = YC_Color.green,
+    background = CustomColor.bg
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -63,8 +65,10 @@ fun MyApplicationTheme(
     }
 
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+        colorScheme = colorScheme.copy(
+            background = CustomColor.bg,
+            surface = CustomColor.bg
+        ),
+        typography = Typography
+    ) { content() }
 }

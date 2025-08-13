@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.R
@@ -26,6 +28,7 @@ import com.example.myapplication.components.AppBar
 import com.example.myapplication.components.LeftButtonType
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.ui.theme.CustomColor
 import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.manager.SelectedMeasurementStore
 import com.example.myapplication.manager.SelectedOrgStore
@@ -44,15 +47,13 @@ fun MainScreen(navController: NavController) {
 
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize().fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        // verticalArrangement = Arrangement.Center
     ) {
         // AppBar
         AppBar(
             leftButtonType = if (SelectedUserStore.get() != null) LeftButtonType.LOGOUT else LeftButtonType.NONE,
-            
-            
             centerWidget = {
                 if (SelectedUserStore.get() != null) {
                     Text(
@@ -73,7 +74,7 @@ fun MainScreen(navController: NavController) {
                     modifier = Modifier
                         .clickable { /* 클릭 시 동작 추가 가능 */
                             LogManager.userAction(MAIN_SCREEN_TAG, "메인 앱바 중앙 텍스트 클릭")
-                            // 기관 선택이 되어있는지 확인
+                        // 기관 선택이 되어있는지 확인
                         navController.navigate(Screen.AdminOrgSelect.route)
                         }
                         .fillMaxWidth()
@@ -106,8 +107,8 @@ fun MainScreen(navController: NavController) {
 
         Row(
             modifier = Modifier
-                .fillMaxWidth().fillMaxHeight()
-                .padding(horizontal = 24.dp),
+                .fillMaxWidth().fillMaxHeight().background(CustomColor.red)
+                .padding(start = 40.dp, top = 10.dp, end = 40.dp, bottom = 40.dp),
             horizontalArrangement = Arrangement.spacedBy(21.dp)
         ) {
             items.forEach { type ->
@@ -149,25 +150,23 @@ fun MeasurementButton(
             LogManager.userAction(MAIN_SCREEN_TAG, "$title 측정 버튼 클릭")
             navigateToMeasurement(navController, type)
         },
-        modifier = modifier,
+        modifier = modifier.fillMaxHeight(),
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
         shape = RoundedCornerShape(24.dp)
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = title, fontSize = 80.sp, lineHeight = 104.sp, color = Color.White)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "측정", fontSize = 80.sp, lineHeight = 104.sp, color = Color.White)
-        }
+        Text(text = title+"측정",style=MaterialTheme.typography.b1,color=CustomColor.white)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    MyApplicationTheme {
-        val nav = rememberNavController()
-        CompositionLocalProvider(LocalAppNavController provides nav) {
-            MainScreen(nav)
-        }
-    }
-} 
+	MyApplicationTheme {
+		val ctx = LocalContext.current
+	SelectedOrgStore.initialize(ctx)
+		val nav = rememberNavController()
+		CompositionLocalProvider(LocalAppNavController provides nav) {
+			MainScreen(nav)
+		}
+	}
+}
