@@ -11,6 +11,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -34,8 +37,13 @@ import com.example.myapplication.manager.SelectedMeasurementStore
 import com.example.myapplication.manager.SelectedOrgStore
 import com.example.myapplication.manager.SelectedUserStore
 import com.example.myapplication.navigation.LocalAppNavController
-import com.example.myapplication.page.measurement.MeasurementType
+import com.example.myapplication.model.MeasurementType
+import com.example.myapplication.model.displayName
 import com.example.myapplication.utils.LogManager
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.PaddingValues
+import com.example.myapplication.ui.theme.Stroke
+import com.example.myapplication.ui.theme.b1
 
 
 // MainScreen은 메인 화면으로, 혈당, 혈압, 체중 측정 버튼을 포함합니다.
@@ -107,7 +115,7 @@ fun MainScreen(navController: NavController) {
 
         Row(
             modifier = Modifier
-                .fillMaxWidth().fillMaxHeight().background(CustomColor.red)
+                .fillMaxWidth().fillMaxHeight()
                 .padding(start = 40.dp, top = 10.dp, end = 40.dp, bottom = 40.dp),
             horizontalArrangement = Arrangement.spacedBy(21.dp)
         ) {
@@ -139,22 +147,42 @@ fun MeasurementButton(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val (title: String, backgroundColor: Color) = when (type) {
-        MeasurementType.BloodSugar -> "혈당" to Color(0xFFE53E3E)
-        MeasurementType.BloodPressure -> "혈압" to Color(0xFFED8936)
-        MeasurementType.Weight -> "체중" to Color(0xFF38A169)
+    val title: String = type.displayName()
+
+ 
+    val shape = RoundedCornerShape(24.dp)
+    val bgPainter = when (type) {
+        MeasurementType.BloodSugar -> painterResource(R.drawable.blood_sugar)
+        MeasurementType.BloodPressure -> painterResource(R.drawable.blood_pressure)
+        MeasurementType.Weight -> painterResource(R.drawable.weight)
     }
 
     Button(
         onClick = {
             LogManager.userAction(MAIN_SCREEN_TAG, "$title 측정 버튼 클릭")
-            navigateToMeasurement(navController, type)
+
+            // 혈당 측정일 때 다이얼로그로 측정시기(식전/식후) 선택, 아니면 기존 플로우
+            if (type == MeasurementType.BloodSugar) {
+              
+            }else{
+
+                navigateToMeasurement(navController, type)
+            }
         },
-        modifier = modifier.fillMaxHeight(),
-        colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
-        shape = RoundedCornerShape(24.dp)
+		modifier = modifier
+			.fillMaxHeight()
+			.clip(shape)
+			.paint(bgPainter, contentScale = ContentScale.Crop)
+			.border(10.dp, Stroke.black20, shape),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        shape = shape,
+        contentPadding = PaddingValues(0.dp)
     ) {
-        Text(text = title+"측정",style=MaterialTheme.typography.b1,color=CustomColor.white)
+        Text(
+            text = "$title\n측정",
+            style = MaterialTheme.typography.b1,
+            color = CustomColor.white
+        )
     }
 }
 

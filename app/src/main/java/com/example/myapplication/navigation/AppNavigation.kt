@@ -18,7 +18,7 @@ import com.example.myapplication.model.UserListResult
 // no nav arguments used; passing complex object via SavedStateHandle
 import com.example.myapplication.page.login.PhoneAuthScreen
 import com.example.myapplication.page.measurement.MeasurementScreen
-import com.example.myapplication.page.measurement.MeasurementType
+import com.example.myapplication.model.MeasurementType
 import com.example.myapplication.page.login.DetectingScreen
  
 

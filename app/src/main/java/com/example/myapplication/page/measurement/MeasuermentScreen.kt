@@ -23,8 +23,8 @@ import com.example.myapplication.components.LeftButtonType
 import com.example.myapplication.manager.SelectedUserStore
 import com.example.myapplication.navigation.LocalAppNavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
-
-enum class MeasurementType { BloodSugar, BloodPressure, Weight }
+import com.example.myapplication.model.MeasurementType
+import com.example.myapplication.model.displayName
 
 @Composable
 fun MeasurementScreen(
@@ -47,12 +47,6 @@ fun MeasurementScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        val title: String = when (type) {
-            MeasurementType.BloodSugar -> "혈당측정을\n시작해보세요!"
-            MeasurementType.BloodPressure -> "혈압측정을\n시작해보세요!"
-            MeasurementType.Weight -> "체중측정을\n시작해보세요!"
-        }
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -60,7 +54,7 @@ fun MeasurementScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, style = MaterialTheme.typography.headlineLarge)
+                Text(text = type.displayName(), style = MaterialTheme.typography.headlineLarge)
                 Spacer(modifier = Modifier.height(16.dp))
                 Surface(
                     modifier = Modifier

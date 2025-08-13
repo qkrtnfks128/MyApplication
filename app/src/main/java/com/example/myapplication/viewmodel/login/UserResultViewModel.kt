@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.navigation.NavController
-import com.example.myapplication.page.measurement.MeasurementType
+import com.example.myapplication.model.MeasurementType
 
 data class UserResultUiState(
     val items: List<UserListItem>

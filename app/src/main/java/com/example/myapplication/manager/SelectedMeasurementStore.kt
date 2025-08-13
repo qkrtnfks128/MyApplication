@@ -1,6 +1,6 @@
 package com.example.myapplication.manager
 
-import com.example.myapplication.page.measurement.MeasurementType
+import com.example.myapplication.model.MeasurementType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
