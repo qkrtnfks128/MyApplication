@@ -61,11 +61,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import com.example.myapplication.R
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.flow.collectLatest
+import com.example.myapplication.viewmodel.login.PhoneAuthViewModel
+import com.example.myapplication.viewmodel.login.PhoneAuthEvent
 
 @Composable
-fun PhoneAuthScreen(navController: NavController) {
-    // 로딩중 표시
-    val isLoading = remember { mutableStateOf(false) }
+fun PhoneAuthScreen(navController: NavController,vm: PhoneAuthViewModel = viewModel()) {
+    val context = LocalContext.current
+    val ui by vm.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -83,9 +89,9 @@ fun PhoneAuthScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(9.dp))
 
-        // 입력 번호 표시
-        val digits = remember { mutableStateListOf("", "", "", "") }
-        var activeIndex by remember { mutableStateOf(digits.indexOfFirst { it.isEmpty() }.coerceAtLeast(0)) }
+        // 입력 번호 표시 (ViewModel 상태 사용)
+        val digits = ui.digits
+        val activeIndex = ui.activeIndex
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             digits.forEachIndexed { index: Int, value: String ->
                 val isActive: Boolean = index == activeIndex
@@ -95,7 +101,7 @@ fun PhoneAuthScreen(navController: NavController) {
                         .size(width = 110.dp, height = 130.dp)
                         .border(5.dp, borderColor, RoundedCornerShape(10.dp))
                         .background(CustomColor.gray06, RoundedCornerShape(10.dp))
-                        .clickable { activeIndex = index },
+                        .clickable { /* 커서 이동은 append/delete 로직에서 자동 진행 */ },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -152,9 +158,7 @@ fun PhoneAuthScreen(navController: NavController) {
                 ) {
                     listOf("1", "2", "3", "4", "5").forEach { label: String ->
                         KeyButton(label = label, modifier = Modifier.weight(1f)) {
-                            digits[activeIndex] = label
-                            val next = activeIndex+1
-                            activeIndex = if (next != 4) next else 3
+                            vm.appendDigit(label)
                         }
                     }
                         ActionButton(
@@ -174,16 +178,8 @@ fun PhoneAuthScreen(navController: NavController) {
                                 }
                             },
                         ) {
-                            if (digits[activeIndex].isEmpty()) {
-                                if (activeIndex > 0) {
-                                    digits[activeIndex] = ""
-                                    activeIndex -= 1
-                                }
-                            } else {
-                                digits[activeIndex] = ""
-                            }
+                            vm.deleteDigit()
                         }
-
                     }
 
                 Row(
@@ -192,51 +188,36 @@ fun PhoneAuthScreen(navController: NavController) {
                 ) {
                     listOf("6", "7", "8", "9", "0").forEach { label: String ->
                         KeyButton(label = label, modifier = Modifier.weight(1f)) {
-                            if (activeIndex in 0..3 ) {
-                                digits[activeIndex] = label
-                            val next = activeIndex+1
-                            activeIndex = if (next != 4) next else 3
-                            }
+                            vm.appendDigit(label)
                         }
                     }
                     ActionButton(
-
                         content = {
-
                                 Text(text = "입력완료", style = MaterialTheme.typography.b5,color = CustomColor.white)
-
                         },
-                        color = if (isLoading.value) CustomColor.gray01 else CustomColor.blue,
+                        color = if (ui.isLoading) CustomColor.gray01 else CustomColor.blue,
                     ) {
-                        val phoneNumber: String = digits.joinToString("")
-                        if (phoneNumber.length != 4) {
-                            CustomToast.show(context, "4자리를 입력해주세요.")
-                            return@ActionButton
-                        }
 
-                        isLoading.value = true
-                        scope.launch {
-                            val centerUuid: String = SelectedOrgStore.getSelected()?.orgUuid ?: ""
-                            val result = repo.getUserListUsingPhoneNumber(
-                                customerCode = NetworkConfig.CUSTOMER_CODE,
-                                centerUuid = centerUuid,
-                                number = phoneNumber
-                            )
-                            result.fold(
-                                onSuccess = { r ->
-                                    navController.currentBackStackEntry?.savedStateHandle?.set(
-                                        Screen.UserResult.KEY_RESULT,
-                                        r
-                                    )
-                                    navController.navigate(Screen.UserResult.route)
-                                },
-                                onFailure = { e ->
-                                    Toast.makeText(context, e.message ?: "요청을 실패했습니다.", Toast.LENGTH_SHORT).show()
-                                }
-                            )
-                            isLoading.value = false
-                        }
+                        vm.submit(NetworkConfig.CUSTOMER_CODE)
                     }
+                }
+            }
+        }
+    }
+
+    // 이벤트 수집: 성공 시 내비게이션, 실패 시 토스트
+    LaunchedEffect(Unit) {
+        vm.events.collectLatest { ev ->
+            when (ev) {
+                is PhoneAuthEvent.Success -> {
+                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                        Screen.UserResult.KEY_RESULT,
+                        ev.result
+                    )
+                    navController.navigate(Screen.UserResult.route)
+                }
+                is PhoneAuthEvent.Error -> {
+                    CustomToast.show(context, ev.message)
                 }
             }
         }

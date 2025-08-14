@@ -29,30 +29,17 @@ import com.example.myapplication.navigation.LocalAppNavController
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         // 자동 로그인 시도 후 성공 시 메인, 실패 시 로그인으로 이동
-        runCatching {
-            AdminManager.adminLogin(
-                "03183921140",
-               "000000"
-            )
-        }.onSuccess { result ->
-            result.onSuccess {
-                LogManager.auth("Splash", "auto_login", true)
-                val cached = SelectedOrgStore.getSelected()
-                val next = if (cached != null) Screen.Main.route else Screen.AdminOrgSelect.route
-                navController.navigate(next) {
-                    popUpTo(Screen.Splash.route) { inclusive = true }
-                    launchSingleTop = true
-                }
-            }.onFailure {
-                LogManager.auth("Splash", "auto_login", false)
-                SelectedOrgStore.clear()
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(Screen.Splash.route) { inclusive = true }
-                    launchSingleTop = true
-                }
+        try {
+            val session = AdminManager.adminLogin("03183921140", "000000")
+            LogManager.auth("Splash", "auto_login", true)
+            val cached = SelectedOrgStore.getSelected()
+            val next = if (cached != null) Screen.Main.route else Screen.AdminOrgSelect.route
+            navController.navigate(next) {
+                popUpTo(Screen.Splash.route) { inclusive = true }
+                launchSingleTop = true
             }
-        }.onFailure {
-            LogManager.error("Splash", "auto_login exception", it)
+        } catch (e: Exception) {
+            LogManager.auth("Splash", "auto_login", false)
             SelectedOrgStore.clear()
             navController.navigate(Screen.Login.route) {
                 popUpTo(Screen.Splash.route) { inclusive = true }

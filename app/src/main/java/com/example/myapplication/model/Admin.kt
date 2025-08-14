@@ -1,13 +1,5 @@
 package com.example.myapplication.model
 
-data class Admin(
-    val id: String,
-    val email: String,
-    val name: String,
-    val isLoggedIn: Boolean = false,
-    val lastLoginTime: Long = 0L
-)
-
 data class AdminSession(
     val userUuid: String,
     val statusCode: Int,

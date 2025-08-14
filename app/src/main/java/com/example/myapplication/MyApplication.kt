@@ -49,8 +49,7 @@ class MyApplication : Application() {
 //}
 
     private fun initializeDependencies() {
-        val authRepository: AuthRepository = AuthRepositoryFactory.create()
-        AdminManager.initialize(authRepository)
+        AdminManager.initialize(this)
         SelectedOrgStore.initialize(this)
         SelectedUserStore.initialize()
         SelectedMeasurementStore.initialize()

@@ -39,15 +39,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun checkLoginStatus() {
-        lifecycleScope.launch {
-            val currentAdmin = AdminManager.getCurrentAdmin()
-            if (currentAdmin == null) {
-                // 로그인되지 않은 경우 처리
-                // TODO: 로그인 화면으로 이동하거나 자동 로그인 시도
-                LogManager.info(TAG, "사용자가 로그인되지 않았습니다.")
-            } else {
-                LogManager.info(TAG, "현재 로그인된 관리자: ${currentAdmin.name}")
-            }
+        val currentSession = AdminManager.getCurrentSession()
+        if (currentSession == null) {
+            // 로그인되지 않은 경우 처리
+            // TODO: 로그인 화면으로 이동하거나 자동 로그인 시도
+            LogManager.info(TAG, "사용자가 로그인되지 않았습니다.")
+        } else {
+            LogManager.info(TAG, "현재 로그인된 관리자: ${currentSession.userUuid}")
         }
     }
 }

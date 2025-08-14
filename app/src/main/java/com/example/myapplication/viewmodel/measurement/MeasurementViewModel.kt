@@ -1,24 +1,45 @@
 package com.example.myapplication.viewmodel.measurement
 
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.model.BloodPressureData
+import com.example.myapplication.model.BloodSugarData
+import com.example.myapplication.model.WeightData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-enum class MeasurementStage { Idle, Waiting, Measuring, Completed }
+enum class MeasurementStage {  Waiting, Measuring, Completed, Error }
 
-data class MeasurementUiState(
-    val stage: MeasurementStage = MeasurementStage.Idle,
-    val message: String = ""
-)
 
 class MeasurementViewModel : ViewModel() {
-    private val _uiState: MutableStateFlow<MeasurementUiState> = MutableStateFlow(MeasurementUiState())
-    val uiState: StateFlow<MeasurementUiState> = _uiState.asStateFlow()
+    private val _stage = MutableStateFlow(MeasurementStage.Waiting)
+    val stage: StateFlow<MeasurementStage> = _stage.asStateFlow()
 
-    fun setWaiting() { _uiState.value = MeasurementUiState(stage = MeasurementStage.Waiting, message = "측정대기중") }
-    fun setMeasuring() { _uiState.value = MeasurementUiState(stage = MeasurementStage.Measuring, message = "측정중...") }
-    fun setCompleted() { _uiState.value = MeasurementUiState(stage = MeasurementStage.Completed, message = "완료") }
+    val lastBloodSugar: BloodSugarData? = null
+    val lastBloodPressure: BloodPressureData? = null
+    val lastWeight: WeightData? = null
+
+    // 측정시작
+    fun triggerStartMeasuring() {
+    viewModelScope.launch {
+        delay(3000)
+        _stage.value = MeasurementStage.Measuring
+        delay(3000)
+        _stage.value = MeasurementStage.Completed
+    }
+
+    }
+
+    //재시도
+    fun triggerRetry() { _stage.value = MeasurementStage.Waiting }
+
+    init {
+        // ViewModel 생성 시 자동으로 측정 시작 트리거 실행
+        triggerStartMeasuring()
+    }
 }
 
 

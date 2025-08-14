@@ -30,9 +30,9 @@ fun AdminLoginScreen(
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
-    
+
     val scope = rememberCoroutineScope()
-    val currentAdmin = AdminManager.observeAdmin()?.collectAsStateWithLifecycle()
+    val currentSession = AdminManager.observeAdminSession()?.collectAsStateWithLifecycle()
     val context = LocalContext.current
     Column(
         modifier = Modifier
@@ -45,18 +45,18 @@ fun AdminLoginScreen(
             text = "관리자 로그인",
             style = MaterialTheme.typography.headlineMedium
         )
-        
+
         Spacer(modifier = Modifier.height(32.dp))
-        
+
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("전화번호") },
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -64,9 +64,9 @@ fun AdminLoginScreen(
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         if (errorMessage.isNotEmpty()) {
             Text(
                 text = errorMessage,
@@ -75,30 +75,28 @@ fun AdminLoginScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
-        
+
         Button(
             onClick = {
                 scope.launch {
                     isLoading = true
                     errorMessage = ""
-                    
-                    val result = AdminManager.adminLogin(email, password)
-                    result.fold(
-                        onSuccess = { user ->
-                          LogManager.auth(ADMIN_LOGIN_SCREEN_TAG, "관리자 로그인", true)
-                          
-                           Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
-                           navController.navigate(Screen.AdminOrgSelect.route) {
-                               popUpTo(Screen.Login.route) { inclusive = true }
-                               launchSingleTop = true
-                           }
-                        },
-                        onFailure = { exception ->
-                            LogManager.auth(ADMIN_LOGIN_SCREEN_TAG, "관리자 로그인", false)
-                            errorMessage = "로그인 실패: ${exception.message}"
+
+                    try {
+                        val session = AdminManager.adminLogin(email, password)
+                        LogManager.auth(ADMIN_LOGIN_SCREEN_TAG, "관리자 로그인", true)
+
+                        Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
+                        navController.navigate(Screen.AdminOrgSelect.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                            launchSingleTop = true
                         }
-                    )
-                    isLoading = false
+                    } catch (e: Exception) {
+                        LogManager.auth(ADMIN_LOGIN_SCREEN_TAG, "관리자 로그인", false)
+                        errorMessage = "로그인 실패: ${e.message}"
+                    } finally {
+                        isLoading = false
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -113,11 +111,11 @@ fun AdminLoginScreen(
                 Text("로그인")
             }
         }
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         // 현재 로그인된 관리자 정보 표시
-        currentAdmin?.value?.let { admin ->
+        currentSession?.value?.let { session ->
             Card(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -128,11 +126,12 @@ fun AdminLoginScreen(
                         text = "현재 로그인된 관리자",
                         style = MaterialTheme.typography.titleSmall
                     )
-                    Text("이름: ${admin.name}")
-                    Text("이메일: ${admin.email}")
-                    
+                    Text("사용자 ID: ${session.userUuid}")
+                    Text("상태 코드: ${session.statusCode}")
+                    Text("기관 수: ${session.adminOrgs.size}")
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     OutlinedButton(
                         onClick = {
                             scope.launch {

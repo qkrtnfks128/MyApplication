@@ -36,7 +36,6 @@ import com.example.myapplication.navigation.LocalAppNavController
 import com.example.myapplication.navigation.Screen
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.manager.SelectedOrgStore
 import com.example.myapplication.ui.theme.CustomColor
 import com.example.myapplication.ui.theme.ShadowTokens
@@ -217,13 +216,9 @@ private fun getLeftButtonClickHandler(
         }
         LeftButtonType.LOGOUT -> { {
             CoroutineScope(Dispatchers.Main).launch {
-                AdminManager.logout()
+                SelectedUserStore.clear()
             }
-        nav.navigate(Screen.UserAuth.route) {
-            popUpTo(nav.graph.id) { inclusive = true }
-            launchSingleTop = true
-            restoreState = false
-        }
+        nav.navigate(Screen.UserAuth.route)
         } }
         LeftButtonType.NONE -> null
     }
