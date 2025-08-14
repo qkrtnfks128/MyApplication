@@ -6,8 +6,6 @@ import com.example.myapplication.manager.AdminManager
 import com.example.myapplication.manager.SelectedOrgStore
 import com.example.myapplication.manager.SelectedUserStore
 import com.example.myapplication.manager.SelectedMeasurementStore
-import com.example.myapplication.repository.AuthRepository
-import com.example.myapplication.repository.AuthRepositoryFactory
 import com.example.myapplication.utils.LogManager
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner

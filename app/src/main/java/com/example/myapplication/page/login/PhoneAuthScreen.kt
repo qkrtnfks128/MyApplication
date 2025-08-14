@@ -42,7 +42,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.myapplication.manager.SelectedOrgStore
 import com.example.myapplication.navigation.LocalAppNavController
 import com.example.myapplication.navigation.Screen
-import com.example.myapplication.repository.SmartCareRepositoryFactory
 import com.example.myapplication.network.NetworkConfig
 import com.example.myapplication.ui.theme.b4
 import com.example.myapplication.ui.theme.h1
@@ -64,6 +63,7 @@ import com.example.myapplication.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
+import com.example.myapplication.repository.WonderfulRepositoryFactory
 import kotlinx.coroutines.flow.collectLatest
 import com.example.myapplication.viewmodel.login.PhoneAuthViewModel
 import com.example.myapplication.viewmodel.login.PhoneAuthEvent
@@ -144,7 +144,7 @@ fun PhoneAuthScreen(navController: NavController,vm: PhoneAuthViewModel = viewMo
         // 숫자패드 및 액션버튼
         val scope = rememberCoroutineScope()
         val context = LocalContext.current
-        val repo = remember { SmartCareRepositoryFactory.create() }
+        val repo = remember { WonderfulRepositoryFactory.create() }
         Box(
             modifier = Modifier
                 .fillMaxWidth().fillMaxHeight()

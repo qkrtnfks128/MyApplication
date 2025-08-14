@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.manager.SelectedOrgStore
 import com.example.myapplication.model.UserListResult
-import com.example.myapplication.repository.SmartCareRepository
-import com.example.myapplication.repository.SmartCareRepositoryFactory
+import com.example.myapplication.repository.WonderfulRepository
+import com.example.myapplication.repository.WonderfulRepositoryFactory
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -26,7 +26,7 @@ sealed class PhoneAuthEvent {
 }
 
 class PhoneAuthViewModel : ViewModel() {
-    private val repository: SmartCareRepository = SmartCareRepositoryFactory.create()
+    private val repository: WonderfulRepository = WonderfulRepositoryFactory.create()
 
     private val _uiState: MutableStateFlow<PhoneAuthUiState> = MutableStateFlow(PhoneAuthUiState())
     val uiState: StateFlow<PhoneAuthUiState> = _uiState.asStateFlow()
@@ -66,15 +66,12 @@ class PhoneAuthViewModel : ViewModel() {
                 return@launch
             }
             _uiState.value = s.copy(isLoading = true)
-            val result = repository.getUserListUsingPhoneNumber(
+            val result: UserListResult = repository.getUserListUsingPhoneNumber(
                 customerCode = customerCode,
                 centerUuid = centerUuid,
                 number = number
             )
-            result.fold(
-                onSuccess = { _events.emit(PhoneAuthEvent.Success(it)) },
-                onFailure = { _events.emit(PhoneAuthEvent.Error(it.message ?: "요청을 실패했습니다.")) }
-            )
+            _events.emit(PhoneAuthEvent.Success(result))
             _uiState.value = _uiState.value.copy(isLoading = false)
         }
     }

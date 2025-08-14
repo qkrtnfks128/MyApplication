@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Base64
 import com.example.myapplication.model.AdminSession
-import com.example.myapplication.repository.AuthRepository
-import com.example.myapplication.repository.AuthRepositoryFactory
+import com.example.myapplication.repository.WonderfulRepository
+import com.example.myapplication.repository.WonderfulRepositoryFactory
 import com.example.myapplication.utils.LogManager
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 // AdminManager는 앱 전체에서 관리자 인증 및 세션 상태를 관리하는 싱글턴 객체입니다.
-// AuthRepository를 직접 보유하며, 로그인/로그아웃/상태 관찰 기능을 제공합니다.
+// WonderfulRepository를 직접 보유하며, 로그인/로그아웃/상태 관찰 기능을 제공합니다.
 // 이메일과 비밀번호는 Base64로 인코딩되어 전달됩니다.
 // 세션 정보는 SharedPreferences에 저장되어 앱 재시작 시에도 유지됩니다.
 
@@ -23,7 +23,7 @@ object AdminManager {
     private const val PREF_NAME: String = "admin_session_prefs"
     private const val KEY_ADMIN_SESSION: String = "admin_session_json"
 
-    private var authRepository: AuthRepository = AuthRepositoryFactory.create()
+    private var authRepository: WonderfulRepository = WonderfulRepositoryFactory.create()
     private var adminSession: AdminSession? = null
 
     // StateFlow for observing session changes

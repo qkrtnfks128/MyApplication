@@ -26,8 +26,8 @@ Repository 계층은 데이터 접근을 담당하는 계층입니다. 로컬 �
 
 ## 네이밍 규칙 (Naming Convention)
 
-- 인터페이스명: `[기능명]Repository` (예: `AuthRepository`, `UserRepository`)
-- 구현체명: `[기능명]RepositoryImpl` (예: `AuthRepositoryImpl`)
+- 인터페이스명: `[기능명]Repository` (예: `WonderfulApi`, `UserRepository`)
+- 구현체명: `[기능명]RepositoryImpl` (예: `WonderfulApiImpl`)
 - 메서드명: 동사로 시작 (예: `login()`, `getUser()`, `saveUser()`)
 
 ## Clean Architecture 원칙
