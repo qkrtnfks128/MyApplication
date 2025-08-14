@@ -26,6 +26,8 @@ import com.example.myapplication.model.AdminOrg
 import com.example.myapplication.navigation.LocalAppNavController
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.ui.theme.b3
+import com.example.myapplication.ui.theme.h1
 
 @Composable
 fun AdminOrgSelectScreen(
@@ -45,7 +47,7 @@ fun AdminOrgSelectScreen(
             centerWidget = {
                 Text(
                     text = "경로당 선택",
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.h1
                 )
             }
         )
@@ -86,10 +88,10 @@ private fun AdminOrgRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                .align(Alignment.CenterHorizontally)
         ) {
-            Text(text = org.orgName, style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "학급 수: ${org.classCount}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = org.orgName, style = MaterialTheme.typography.b3)
+
         }
     }
 }

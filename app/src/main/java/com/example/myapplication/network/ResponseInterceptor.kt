@@ -1,6 +1,9 @@
 package com.example.myapplication.network
 
 import com.example.myapplication.utils.LogManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
@@ -14,6 +17,17 @@ class ResponseInterceptor : Interceptor {
 
     companion object {
         private const val TAG = "ResponseInterceptor"
+
+        // 에러 화면으로 이동하는 콜백
+        private var errorNavigationCallback: ((String) -> Unit)? = null
+
+        fun setErrorNavigationCallback(callback: (String) -> Unit) {
+            errorNavigationCallback = callback
+        }
+
+        fun clearErrorNavigationCallback() {
+            errorNavigationCallback = null
+        }
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -26,16 +40,19 @@ class ResponseInterceptor : Interceptor {
                 response.code in 400..499 -> {
                     val errorMessage = getClientErrorMessage(response.code)
                     LogManager.error(TAG, "Client Error: ${response.code} - $errorMessage")
+                    navigateToErrorScreen(errorMessage)
                     throw ClientErrorException(response.code, errorMessage)
                 }
                 response.code in 500..599 -> {
                     val errorMessage = getServerErrorMessage(response.code)
                     LogManager.error(TAG, "Server Error: ${response.code} - $errorMessage")
+                    navigateToErrorScreen(errorMessage)
                     throw ServerErrorException(response.code, errorMessage)
                 }
                 else -> {
                     val errorMessage = "Unexpected HTTP status: ${response.code}"
                     LogManager.error(TAG, errorMessage)
+                    navigateToErrorScreen(errorMessage)
                     throw NetworkException(errorMessage)
                 }
             }
@@ -48,26 +65,38 @@ class ResponseInterceptor : Interceptor {
                 is SocketTimeoutException -> {
                     val errorMessage = "요청 시간이 초과되었습니다. 네트워크 상태를 확인해주세요."
                     LogManager.error(TAG, "Timeout Error: $errorMessage")
+                    navigateToErrorScreen(errorMessage)
                     throw NetworkException(errorMessage)
                 }
 
                 is UnknownHostException -> {
                     val errorMessage = "서버에 연결할 수 없습니다. 인터넷 연결을 확인해주세요."
                     LogManager.error(TAG, "Connection Error: $errorMessage")
+                    navigateToErrorScreen(errorMessage)
                     throw NetworkException(errorMessage)
                 }
 
                 is IOException -> {
                     val errorMessage = "네트워크 통신 중 오류가 발생했습니다."
                     LogManager.error(TAG, "IO Error: $errorMessage", e)
+                    navigateToErrorScreen(errorMessage)
                     throw NetworkException(errorMessage)
                 }
 
                 else -> {
                     val errorMessage = "알 수 없는 네트워크 오류가 발생했습니다."
                     LogManager.error(TAG, "Unknown Error: $errorMessage", e)
+                    navigateToErrorScreen(errorMessage)
                     throw NetworkException(errorMessage)
                 }
+            }
+        }
+    }
+
+    private fun navigateToErrorScreen(errorMessage: String) {
+        errorNavigationCallback?.let { callback ->
+            CoroutineScope(Dispatchers.Main).launch {
+                callback(errorMessage)
             }
         }
     }

@@ -28,6 +28,10 @@ import com.example.myapplication.page.login.PhoneAuthScreen
 import com.example.myapplication.page.measurement.MeasurementScreen
 import com.example.myapplication.model.MeasurementType
 import com.example.myapplication.page.login.DetectingScreen
+import android.net.Uri
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.myapplication.page.error.ErrorScreen
 
 
 // AppNavigation에서 사용할 네비게이션 관련 함수와 화면을 정의합니다.
@@ -55,7 +59,6 @@ fun AppNavigation() {
                         shouldResetToMain = false
                     }
                 }
-
                 else -> Unit
             }
         }
@@ -125,7 +128,16 @@ fun AppNavigation() {
         composable(Screen.Detecting.route) {
             DetectingScreen(navController = navController)
         }
-
+        composable(
+            route = Screen.Error.route + "/{errorMessage}",
+        ) { backStackEntry ->
+            val errorMessage = backStackEntry.arguments?.getString("errorMessage")
+                ?: "네트워크 오류가 발생했습니다."
+            ErrorScreen(
+                navController = navController,
+                errorMessage = errorMessage
+            )
+        }
     }
 
     }
@@ -144,5 +156,6 @@ sealed class Screen(val route: String) {
     }
     object Measurement : Screen("measurement")
     object Detecting : Screen("detecting")
+    object Error : Screen("error")
 
 }

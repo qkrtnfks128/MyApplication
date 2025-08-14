@@ -38,7 +38,6 @@ class WonderfulRepositoryImpl(
             // ResponseErrorInterceptor에서 이미 에러 처리됨
             val body = response.body() ?: throw IllegalStateException("Empty response body")
 
-            // 성공 처리
             val orgs: List<AdminOrg> = body.adminList.map {
                 AdminOrg(
                     orgUuid = it.KINDERGARTEN_UUID,

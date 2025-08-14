@@ -23,7 +23,7 @@ object AdminManager {
     private const val PREF_NAME: String = "admin_session_prefs"
     private const val KEY_ADMIN_SESSION: String = "admin_session_json"
 
-    private var authRepository: WonderfulRepository = WonderfulRepositoryFactory.create()
+    private var repository: WonderfulRepository = WonderfulRepositoryFactory.create()
     private var adminSession: AdminSession? = null
 
     // StateFlow for observing session changes
@@ -38,7 +38,6 @@ object AdminManager {
 
         // 저장된 세션 정보가 있다면 복원
         restoreSession()
-
         LogManager.info(TAG, "AdminManager initialized")
     }
 
@@ -86,7 +85,7 @@ object AdminManager {
         val encodedEmail: String = Base64.encodeToString(email.toByteArray(), Base64.NO_WRAP)
         val encodedPassword: String = Base64.encodeToString(password.toByteArray(), Base64.NO_WRAP)
 
-        val result: AdminSession = authRepository.adminLogin(encodedEmail, encodedPassword)
+        val result: AdminSession = repository.adminLogin(encodedEmail, encodedPassword)
 
         // 메모리에 세션 저장
         adminSession = result
