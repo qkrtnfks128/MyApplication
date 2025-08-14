@@ -1,8 +1,8 @@
 package com.example.myapplication.viewmodel.measurement
 
+import BloodSugarData
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.model.BloodPressureData
-import com.example.myapplication.model.BloodSugarData
 import com.example.myapplication.model.WeightData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,10 +17,9 @@ enum class MeasurementStage {  Waiting, Measuring, Completed, Error }
 class MeasurementViewModel : ViewModel() {
     private val _stage = MutableStateFlow(MeasurementStage.Waiting)
     val stage: StateFlow<MeasurementStage> = _stage.asStateFlow()
-
-    val lastBloodSugar: BloodSugarData? = null
-    val lastBloodPressure: BloodPressureData? = null
-    val lastWeight: WeightData? = null
+    val bloodSugarData: BloodSugarData? = null
+    val bloodPressureData: BloodPressureData? = null
+    val weightData: WeightData? = null
 
     // 측정시작
     fun triggerStartMeasuring() {

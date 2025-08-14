@@ -1,11 +1,15 @@
-package com.example.myapplication.model
+
 
 data class BloodSugarData(
-    val id: String,
-    val measurementTime: String, // yyyyMMddHHmmss 형식
-    val bloodSugarLevel: Int, // mg/dL
-    val mealType: MealType,
-    val status: BloodSugarStatus
+    val Date: String,
+    val Time: String,
+    val GlucoseResult: Int,
+    val Temperature: Float,
+    // 식전 식후 플래그 추가
+    val mealFlag: MealType? = null,
+    // 판정값 추가
+    val judgment: BloodSugarStatus? = null
+
 )
 
 enum class MealType {
@@ -13,8 +17,3 @@ enum class MealType {
     AFTER_MEAL   // 식후
 }
 
-enum class BloodSugarStatus {
-    HIGH,    // 높음
-    NORMAL,  // 보통
-    LOW      // 낮음
-} 
