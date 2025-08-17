@@ -1,11 +1,12 @@
 package com.example.myapplication.repository
 
-import BloodSugarData
+
 import BloodSugarNetworkModel
 import BloodSugarNetworkResponse
 import DeviceData
 import GLUBodyData
 import InBodyGLUDevice
+import com.example.myapplication.model.BloodSugarData
 import com.example.myapplication.network.NetworkConfig
 import com.example.myapplication.network.RetrofitProvider
 import com.example.myapplication.network.api.YcSmartApi
@@ -32,19 +33,19 @@ class YcSmartRepositoryImpl(
             datetime = deviceData.datetime,
             data = InBodyGLUDevice(
                 body_data = GLUBodyData(
-                    Date = data.Date,
-                    Time = data.Time,
-                    GlucoseResult = data.GlucoseResult,
-                    Temperature = data.Temperature
+                    Date = data.date,
+                    Time = data.time,
+                    GlucoseResult = data.glucoseResult,
+                    Temperature = data.temperature
                 )
             )
         )
         val response: Response<BloodSugarNetworkResponse> = ycSmartApi.postBloodSugarData(networkModel)
         return BloodSugarData(
-            Date = data.Date,
-            Time = data.Time,
-            GlucoseResult = data.GlucoseResult,
-            Temperature = data.Temperature,
+            date = data.date,
+            time = data.time,
+            glucoseResult = data.glucoseResult,
+            temperature = data.temperature,
             mealFlag = data.mealFlag,
             judgment = response.body()?.judgment ?: null
         )

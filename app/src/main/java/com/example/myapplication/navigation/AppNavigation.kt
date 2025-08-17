@@ -26,6 +26,7 @@ import com.example.myapplication.model.UserListResult
 // no nav arguments used; passing complex object via SavedStateHandle
 import com.example.myapplication.page.login.PhoneAuthScreen
 import com.example.myapplication.page.measurement.MeasurementScreen
+import com.example.myapplication.page.measurement.BloodSugarResultScreen
 import com.example.myapplication.model.MeasurementType
 import com.example.myapplication.page.login.DetectingScreen
 import android.net.Uri
@@ -33,9 +34,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.myapplication.page.error.ErrorScreen
 
-
 // AppNavigation에서 사용할 네비게이션 관련 함수와 화면을 정의합니다.
-
 
 @Composable
 fun AppNavigation() {
@@ -125,6 +124,9 @@ fun AppNavigation() {
             }
             MeasurementScreen(navController = navController, type = type)
         }
+        composable(Screen.BloodSugarResult.route) {
+            BloodSugarResultScreen(navController = navController)
+        }
         composable(Screen.Detecting.route) {
             DetectingScreen(navController = navController)
         }
@@ -155,6 +157,7 @@ sealed class Screen(val route: String) {
         const val KEY_RESULT: String = "user_result"
     }
     object Measurement : Screen("measurement")
+    object BloodSugarResult : Screen("bloodSugarResult")
     object Detecting : Screen("detecting")
     object Error : Screen("error")
 

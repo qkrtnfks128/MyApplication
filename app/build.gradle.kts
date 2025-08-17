@@ -51,23 +51,23 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.material)
-    
+
     // Foundation (기본 컴포넌트)
     implementation(libs.compose.foundation)
-    
+
     // Material Icons
     implementation(libs.compose.material.icons.core)
     implementation(libs.compose.material.icons.extended)
-    
+
     // Adaptive (윈도우 크기 유틸리티)
     implementation(libs.compose.material3.adaptive)
-    
+
     // ViewModel Compose 통합
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    
+
     // Runtime LiveData 통합
     implementation(libs.compose.runtime.livedata)
-    
+
     // Navigation Compose
     implementation(libs.androidx.navigation.compose)
 
@@ -103,7 +103,8 @@ dependencies {
 
     // Timber (로깅)
     implementation("com.jakewharton.timber:timber:5.0.1")
-
+    // json 직렬화
+ implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
 
 

@@ -1,8 +1,7 @@
 package com.example.myapplication.page.history
 
-import BloodSugarData
+
 import BloodSugarStatus
-import MealType
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,7 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.NavController
 import com.example.myapplication.components.AppBar
@@ -30,6 +28,8 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import com.example.myapplication.R
+import com.example.myapplication.model.BloodSugarData
+import com.example.myapplication.model.MealType
 import com.example.myapplication.navigation.LocalAppNavController
 
 
@@ -93,7 +93,7 @@ fun BloodSugarHistoryScreen(navController: NavController) {
         ) {
             items(testData) { bloodSugarData ->
                 HistoryRow(
-                    timeString = bloodSugarData.Time,
+                    timeString = bloodSugarData.time,
                     rightWidget = {
                         BloodSugarInfoWidget(bloodSugarData)
                     }
@@ -157,84 +157,84 @@ private fun getMealTypeText(mealType: MealType): String {
 private fun createTestData(): List<BloodSugarData> {
     return listOf(
         BloodSugarData(
-        Date = "20240805",
-        Time = "102000",
-        GlucoseResult = 180,
-        Temperature = 36.5f,
+        date = "20240805",
+        time = "102000",
+        glucoseResult = 180,
+        temperature = 36.5f,
             mealFlag = MealType.AFTER_MEAL,
-        judgment = BloodSugarStatus.NORMAL
+        judgment = BloodSugarStatus.NORMAL as BloodSugarStatus
     ),
     BloodSugarData(
-        Date = "20240806",
-        Time = "091100",
-        GlucoseResult = 235,
-        Temperature = 36.8f,
+        date = "20240806",
+        time = "091100",
+        glucoseResult = 235,
+        temperature = 36.8f,
         mealFlag = MealType.BEFORE_MEAL,
-        judgment = BloodSugarStatus.HIGH
+        judgment = BloodSugarStatus.HIGH as BloodSugarStatus
     ),
     BloodSugarData(
-        Date = "20240804",
-        Time = "174000",
-        GlucoseResult = 75,
-        Temperature = 36.2f,
+        date = "20240804",
+        time = "174000",
+        glucoseResult = 75,
+        temperature = 36.2f,
         mealFlag = MealType.AFTER_MEAL,
-        judgment = BloodSugarStatus.LOW
+        judgment = BloodSugarStatus.LOW as BloodSugarStatus
     ),
     BloodSugarData(
-        Date = "20240803",
-        Time = "120000",
-        GlucoseResult = 120,
-        Temperature = 36.6f,
+        date = "20240803",
+        time = "120000",
+        glucoseResult = 120,
+        temperature = 36.6f,
         mealFlag = MealType.BEFORE_MEAL,
-        judgment = BloodSugarStatus.NORMAL
+        judgment = BloodSugarStatus.NORMAL as BloodSugarStatus
     ),
     BloodSugarData(
-        Date = "20240802",
-        Time = "183000",
-        GlucoseResult = 200,
-        Temperature = 37.1f,
+        date = "20240802",
+        time = "183000",
+        glucoseResult = 200,
+        temperature = 37.1f,
         mealFlag = MealType.AFTER_MEAL,
-        judgment = BloodSugarStatus.HIGH
+        judgment = BloodSugarStatus.HIGH as BloodSugarStatus
     ),
     BloodSugarData(
-        Date = "20240801",
-        Time = "080000",
-        GlucoseResult = 95,
-        Temperature = 36.4f,
+        date = "20240801",
+        time = "080000",
+        glucoseResult = 95,
+        temperature = 36.4f,
         mealFlag = MealType.BEFORE_MEAL,
-        judgment = BloodSugarStatus.NORMAL
+        judgment = BloodSugarStatus.NORMAL as BloodSugarStatus
     ),
     BloodSugarData(
-        Date = "20240731",
-        Time = "193000",
-        GlucoseResult = 160,
-        Temperature = 36.9f,
+        date = "20240731",
+        time = "193000",
+        glucoseResult = 160,
+        temperature = 36.9f,
         mealFlag = MealType.AFTER_MEAL,
-        judgment = BloodSugarStatus.NORMAL
+        judgment = BloodSugarStatus.NORMAL as BloodSugarStatus
     ),
     BloodSugarData(
-        Date = "20240730",
-        Time = "073000",
-        GlucoseResult = 110,
-        Temperature = 36.3f,
+        date = "20240730",
+        time = "073000",
+        glucoseResult = 110,
+        temperature = 36.3f,
         mealFlag = MealType.BEFORE_MEAL,
-        judgment = BloodSugarStatus.NORMAL
+        judgment = BloodSugarStatus.NORMAL as BloodSugarStatus
     ),
     BloodSugarData(
-        Date = "20240729",
-        Time = "140000",
-        GlucoseResult = 280,
-        Temperature = 37.2f,
+        date = "20240729",
+        time = "140000",
+        glucoseResult = 280,
+        temperature = 37.2f,
         mealFlag = MealType.AFTER_MEAL,
-        judgment = BloodSugarStatus.HIGH
+        judgment = BloodSugarStatus.HIGH as BloodSugarStatus
     ),
     BloodSugarData(
-        Date = "20240728",
-        Time = "090000",
-        GlucoseResult = 85,
-        Temperature = 36.1f,
+        date = "20240728",
+        time = "090000",
+        glucoseResult = 85,
+        temperature = 36.1f,
         mealFlag = MealType.BEFORE_MEAL,
-        judgment = BloodSugarStatus.NORMAL
+        judgment = BloodSugarStatus.NORMAL as BloodSugarStatus
     )
     )
 }

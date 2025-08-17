@@ -28,17 +28,26 @@ import androidx.compose.ui.res.painterResource
 import com.example.myapplication.R
 import com.example.myapplication.components.AppBar
 import com.example.myapplication.components.LeftButtonType
+import com.example.myapplication.model.BloodSugarData
+import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.CustomColor
 import com.example.myapplication.ui.theme.Stroke
 import com.example.myapplication.ui.theme.b2
 import com.example.myapplication.ui.theme.b3
 import com.example.myapplication.ui.theme.b4
+import kotlinx.coroutines.delay
+import com.example.myapplication.viewmodel.measurement.MeasurementViewModelFactory
+
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun MeasurementScreen(
     navController: NavController,
     type: MeasurementType,
-    vm: MeasurementViewModel = viewModel()
+    vm: MeasurementViewModel = viewModel(
+        factory = MeasurementViewModelFactory(type) // 팩토리 사용
+    )
 ) {
     val userName: String = SelectedUserStore.get()?.name ?: "사용자"
     val stage by vm.stage.collectAsState()
@@ -67,7 +76,26 @@ fun MeasurementScreen(
                 )
             }
             MeasurementStage.Completed -> {
-                CompletedStateCard()
+                CompletedStateCard( type = type,navController = navController,onEnd = {
+                    when (type) {
+                        MeasurementType.BloodSugar -> {
+                             // 현재 백스택 엔트리에 데이터 저장
+                             navController.currentBackStackEntry?.savedStateHandle?.set(
+                                "blood_sugar_data",
+                                Json.encodeToString<BloodSugarData>(vm.bloodSugarData!!.value)
+                            )
+                            navController.navigate(Screen.BloodSugarResult.route){
+                                // 모든 페이지 지우고 이동
+                                popUpTo(navController.graph.id) { inclusive = true }
+                                launchSingleTop = true
+                                restoreState = false
+                            }
+                        }
+                        MeasurementType.BloodPressure -> TODO()
+                        MeasurementType.Weight -> TODO()
+                    }
+
+                })
             }
             MeasurementStage.Error -> {
                 ErrorStateCard(onRetry = { vm.triggerRetry() })
@@ -125,16 +153,11 @@ private fun ProcessCard(
                     }
                 }
                 MeasurementStage.Measuring -> {
-                    // 측정중: 점 3개 애니메이션
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        repeat(3) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(8.dp),
-                                color = CustomColor.blue,
-                                strokeWidth = 2.dp
-                            )
-                        }
-                    }
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(34.dp),
+                        color = CustomColor.blue,
+                        strokeWidth = 6.dp
+                    )
                 }
                 else -> { /* 처리하지 않음 */ }
             }
@@ -157,11 +180,11 @@ private fun ProcessCard(
 }
 
 @Composable
-private fun CompletedStateCard() {
+private fun CompletedStateCard(  type: MeasurementType,navController: NavController,onEnd: () -> Unit) {
     // 3초뒤 결과 페이지 이동(페이지 스택 전부 삭제)
     LaunchedEffect(Unit) {
-        // delay(3000)
-        // navController.navigate("result")
+        delay(3000)
+        onEnd()
     }
         Column(
             modifier = Modifier
@@ -261,3 +284,5 @@ private fun MeasurementScreenPreview_Weight() {
         MeasurementScreen(nav, MeasurementType.Weight)
     }
 }
+
+

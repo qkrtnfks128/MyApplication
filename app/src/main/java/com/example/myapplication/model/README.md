@@ -38,19 +38,13 @@ Model 계층은 앱에서 사용되는 데이터 구조를 정의하는 계층�
 // User.kt
 fun User.toEntity(): UserEntity {
     return UserEntity(
-        id = id,
-        email = email,
-        name = name,
-        createdAt = createdAt
+
     )
 }
 
 fun UserEntity.toDomain(): User {
     return User(
-        id = id,
-        email = email,
-        name = name,
-        createdAt = createdAt
+
     )
 }
 ```
@@ -59,10 +53,7 @@ fun UserEntity.toDomain(): User {
 
 ```kotlin
 data class BloodSugarData(
-    val id: String,
     val value: Int,
-    val timestamp: Long,
-    val type: String
 ) {
     fun toDisplayValue(): String {
         return "$value mg/dL"
