@@ -72,25 +72,25 @@ class PhoneAuthViewModel : ViewModel() {
             )
 
             // 유저 2명인 경우의 목데이터 생성
-            val mockResult = UserListResult(
-                statusCode = 1,
-                items = listOf(
-                    UserListItem(
-                        name = "홍길동",
-                        cvid = "CVID-001",
-                        imageUrl = "",
-                        parentTel = "01012345678",
-                        registrationDate = "1954년 01월 18일"
-                    ),
-                    UserListItem(
-                        name = "김철수",
-                        cvid = "CVID-002",
-                        imageUrl = "",
-                        parentTel = "01087654321",
-                        registrationDate = "1960년 03월 01일"
-                    )
-                )
-            )
+            // val mockResult = UserListResult(
+            //     statusCode = 1,
+            //     items = listOf(
+            //         UserListItem(
+            //             name = "홍길동",
+            //             cvid = "CVID-001",
+            //             imageUrl = "",
+            //             parentTel = "01012345678",
+            //             registrationDate = "1954년 01월 18일"
+            //         ),
+            //         UserListItem(
+            //             name = "김철수",
+            //             cvid = "CVID-002",
+            //             imageUrl = "",
+            //             parentTel = "01087654321",
+            //             registrationDate = "1960년 03월 01일"
+            //         )
+            //     )
+            // )
             _events.emit(PhoneAuthEvent.Success(result))
 
         }

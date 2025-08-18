@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.myapplication.components.AppBar
 import com.example.myapplication.components.LeftButtonType
@@ -218,6 +219,8 @@ private fun SingleConfirmSection(item: UserListItem) {
 // 여러 사용자 결과 표시
 @Composable
 private fun MultiResultSection(items: List<UserListItem>,) {
+    val vm: UserResultViewModel = viewModel()
+    val nav  =  LocalAppNavController.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -226,6 +229,7 @@ private fun MultiResultSection(items: List<UserListItem>,) {
         Text(
             text = "본인을 선택해 주세요",
             style = MaterialTheme.typography.b4,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(19.dp))
         LazyColumn(
@@ -234,10 +238,7 @@ private fun MultiResultSection(items: List<UserListItem>,) {
         ) {
 
             items(items) { item ->
-               @Composable {
-                val vm: UserResultViewModel = viewModel()
-                val nav  =  LocalAppNavController.current
-                UserRow(item = item, isHighlighted = false) {
+                UserRow(item = item,) {
                     val type = vm.saveUserDataAndGetMeasurementType(item)
                     if (type != null) {
                         nav.navigate(
@@ -254,15 +255,16 @@ private fun MultiResultSection(items: List<UserListItem>,) {
                             restoreState = false
                         }
                     }
-                 }}
+                 }
+
             }
         }
     }
 }
 
 @Composable
-private fun UserRow(item: UserListItem, isHighlighted: Boolean, onClick: () -> Unit) {
-    val borderColor: Color = if (isHighlighted) Color(0xFF1E88E5) else Color(0xFF90CAF9)
+private fun UserRow(item: UserListItem,  onClick: () -> Unit) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -275,7 +277,7 @@ private fun UserRow(item: UserListItem, isHighlighted: Boolean, onClick: () -> U
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .border(width = 3.dp, color = borderColor, shape = RoundedCornerShape(16.dp))
+                .border(width = 3.dp, color = CustomColor.blue, shape = RoundedCornerShape(16.dp))
                 .background(Color.White, RoundedCornerShape(16.dp))
                 .padding(horizontal = 20.dp),
             contentAlignment = Alignment.CenterStart
