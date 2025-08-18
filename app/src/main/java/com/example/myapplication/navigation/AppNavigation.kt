@@ -26,13 +26,19 @@ import com.example.myapplication.model.UserListResult
 // no nav arguments used; passing complex object via SavedStateHandle
 import com.example.myapplication.page.login.PhoneAuthScreen
 import com.example.myapplication.page.measurement.MeasurementScreen
-import com.example.myapplication.page.measurement.BloodSugarResultScreen
 import com.example.myapplication.model.MeasurementType
 import com.example.myapplication.page.login.DetectingScreen
 import android.net.Uri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.myapplication.model.BloodPressureData
+import com.example.myapplication.model.BloodSugarData
+import com.example.myapplication.model.WeightData
 import com.example.myapplication.page.error.ErrorScreen
+import com.example.myapplication.viewmodel.measurement.MeasurementViewModel
+import com.example.myapplication.viewmodel.measurement.MeasurementViewModelFactory
+import kotlinx.serialization.json.Json
 
 // AppNavigation에서 사용할 네비게이션 관련 함수와 화면을 정의합니다.
 
@@ -104,7 +110,7 @@ fun AppNavigation() {
             val current = backStackEntry.savedStateHandle
             val prev = navController.previousBackStackEntry?.savedStateHandle
 
-            // first time: move data from previous entry to current entry
+            //  이전 화면에서 다음 화면으로 데이터를 전달하고, 이전 화면의 데이터를 정리
             prev?.get<UserListResult>(Screen.UserResult.KEY_RESULT)?.let { moved ->
                 current.set(Screen.UserResult.KEY_RESULT, moved)
                 prev.remove<UserListResult>(Screen.UserResult.KEY_RESULT)
@@ -122,11 +128,70 @@ fun AppNavigation() {
                 "Weight" -> MeasurementType.Weight
                 else -> MeasurementType.BloodSugar
             }
-            MeasurementScreen(navController = navController, type = type)
+
+            // 공유 ViewModel 사용
+            val measurementViewModel: MeasurementViewModel = viewModel(
+                factory = MeasurementViewModelFactory(type)
+            )
+
+            MeasurementScreen(navController = navController, type = type, vm = measurementViewModel)
         }
-        composable(Screen.BloodSugarResult.route) {
-            BloodSugarResultScreen(navController = navController)
-        }
+    //     //  혈당 결과
+    //     composable(Screen.BloodSugarResult.route) { backStackEntry ->
+    //         val current = backStackEntry.savedStateHandle
+    //         val prev = navController.previousBackStackEntry?.savedStateHandle
+
+    //          // 이전 화면에서 다음 화면으로 데이터를 전달하고, 이전 화면의 데이터를 정리
+    //          prev?.get<BloodSugarData>(Screen.BloodSugarResult.KEY_BLOOD_SUGAR_DATA)?.let { moved ->
+    //             current.set(Screen.BloodSugarResult.KEY_BLOOD_SUGAR_DATA, moved)
+    //             prev.remove<BloodSugarData>(Screen.BloodSugarResult.KEY_BLOOD_SUGAR_DATA)
+    //         }
+
+    // // JSON 문자열을 파싱
+    // val jsonData = current.get<String>(Screen.BloodSugarResult.KEY_BLOOD_SUGAR_DATA)
+    // if (jsonData == null) {
+    //     return@composable
+    // }
+
+    // val result = try {
+    //     Json.decodeFromString<BloodSugarData>(jsonData)
+    // } catch (e: Exception) {
+    //     LogManager.error("JSON parsing error", e.toString())
+    //     return@composable
+    // }
+
+    //         BloodSugarResultScreen(navController = navController, bloodSugarData = result)
+    //     }
+    //     // 혈압 결과
+    //     composable(Screen.BloodPressureResult.route) { backStackEntry ->
+    //         val current = backStackEntry.savedStateHandle
+    //         val prev = navController.previousBackStackEntry?.savedStateHandle
+
+    //         // 이전 화면에서 다음 화면으로 데이터를 전달하고, 이전 화면의 데이터를 정리
+    //         prev?.get<BloodPressureData>(Screen.BloodPressureResult.KEY_BLOOD_PRESSURE_DATA)?.let { moved ->
+    //             current.set(Screen.BloodPressureResult.KEY_BLOOD_PRESSURE_DATA, moved)
+    //             prev.remove<BloodPressureData>(Screen.BloodPressureResult.KEY_BLOOD_PRESSURE_DATA)
+    //         }
+
+    //         val result = current.get<BloodPressureData>(Screen.BloodPressureResult.KEY_BLOOD_PRESSURE_DATA)?:return@composable
+
+    //         BloodPressureResultScreen(navController = navController, bloodPressureData = result)
+    //     }
+    //     // 체중 결과
+    //     composable(Screen.WeightResult.route) { backStackEntry ->
+    //         val current = backStackEntry.savedStateHandle
+    //         val prev = navController.previousBackStackEntry?.savedStateHandle
+
+    //         // 이전 화면에서 다음 화면으로 데이터를 전달하고, 이전 화면의 데이터를 정리
+    //         prev?.get<WeightData>(Screen.WeightResult.KEY_WEIGHT_DATA)?.let { moved ->
+    //             current.set(Screen.WeightResult.KEY_WEIGHT_DATA, moved)
+    //             prev.remove<WeightData>(Screen.WeightResult.KEY_WEIGHT_DATA)
+    //         }
+
+    //         val result = current.get<WeightData>(Screen.WeightResult.KEY_WEIGHT_DATA)?:return@composable
+
+    //         WeightResultScreen(navController = navController, weightData = result)
+    //     }
         composable(Screen.Detecting.route) {
             DetectingScreen(navController = navController)
         }
@@ -157,7 +222,18 @@ sealed class Screen(val route: String) {
         const val KEY_RESULT: String = "user_result"
     }
     object Measurement : Screen("measurement")
-    object BloodSugarResult : Screen("bloodSugarResult")
+    // object BloodSugarResult : Screen("bloodSugarResult")
+    // {
+    //     const val KEY_BLOOD_SUGAR_DATA: String = "blood_sugar_data"
+    // }
+    // object BloodPressureResult : Screen("bloodPressureResult")
+    // {
+    //     const val KEY_BLOOD_PRESSURE_DATA: String = "blood_pressure_data"
+    // }
+    // object WeightResult : Screen("weightResult")
+    // {
+    //     const val KEY_WEIGHT_DATA: String = "weight_data"
+    // }
     object Detecting : Screen("detecting")
     object Error : Screen("error")
 

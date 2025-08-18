@@ -32,23 +32,35 @@ import com.example.myapplication.model.BloodSugarData
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.ui.theme.CustomColor
 import com.example.myapplication.ui.theme.Stroke
+import com.example.myapplication.ui.theme.b1
 import com.example.myapplication.ui.theme.b2
 import com.example.myapplication.ui.theme.b3
 import com.example.myapplication.ui.theme.b4
+import com.example.myapplication.ui.theme.b5
 import kotlinx.coroutines.delay
 import com.example.myapplication.viewmodel.measurement.MeasurementViewModelFactory
-
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import androidx.compose.ui.platform.LocalContext
+import com.example.myapplication.ui.components.CustomToast
+import com.example.myapplication.viewmodel.measurement.MeasurementEvent
+import kotlinx.coroutines.flow.collectLatest
+import com.example.myapplication.ui.components.Chip
+import getStatusColor
+import getStatusText
+import com.example.myapplication.model.BloodPressureData
+import com.example.myapplication.model.WeightData
+import com.example.myapplication.model.MealType
 
 @Composable
 fun MeasurementScreen(
     navController: NavController,
     type: MeasurementType,
     vm: MeasurementViewModel = viewModel(
-        factory = MeasurementViewModelFactory(type) // 팩토리 사용
+        factory = MeasurementViewModelFactory(type)
     )
 ) {
+    val context = LocalContext.current
     val userName: String = SelectedUserStore.get()?.name ?: "사용자"
     val stage by vm.stage.collectAsState()
 
@@ -56,7 +68,6 @@ fun MeasurementScreen(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 공통 AppBar 사용
         AppBar(
             leftButtonType = LeftButtonType.HOME,
             centerWidget = {
@@ -67,38 +78,40 @@ fun MeasurementScreen(
             }
         )
 
-
         when (stage) {
-            MeasurementStage.Waiting,    MeasurementStage.Measuring -> {
+            MeasurementStage.Waiting, MeasurementStage.Measuring -> {
                 ProcessCard(
                     type = type,
                     stage = stage
                 )
             }
             MeasurementStage.Completed -> {
-                CompletedStateCard( type = type,navController = navController,onEnd = {
-                    when (type) {
-                        MeasurementType.BloodSugar -> {
-                             // 현재 백스택 엔트리에 데이터 저장
-                             navController.currentBackStackEntry?.savedStateHandle?.set(
-                                "blood_sugar_data",
-                                Json.encodeToString<BloodSugarData>(vm.bloodSugarData!!.value)
-                            )
-                            navController.navigate(Screen.BloodSugarResult.route){
-                                // 모든 페이지 지우고 이동
-                                popUpTo(navController.graph.id) { inclusive = true }
-                                launchSingleTop = true
-                                restoreState = false
-                            }
-                        }
-                        MeasurementType.BloodPressure -> TODO()
-                        MeasurementType.Weight -> TODO()
-                    }
-
-                })
+                CompletedStateCard()
             }
             MeasurementStage.Error -> {
                 ErrorStateCard(onRetry = { vm.triggerRetry() })
+            }
+            MeasurementStage.ShowingResult -> {
+                when (type) {
+                    MeasurementType.BloodSugar -> {
+                        val bloodSugarData by vm.bloodSugarData.collectAsState()
+                        bloodSugarData?.let {
+                            BloodSugarResultCard(bloodSugarData = it, navController = navController)
+                        }
+                    }
+                    MeasurementType.BloodPressure -> {
+                        val bloodPressureData by vm.bloodPressureData.collectAsState()
+                        bloodPressureData?.let {
+                            BloodPressureResultCard(bloodPressureData = it, navController = navController)
+                        }
+                    }
+                    MeasurementType.Weight -> {
+                        val weightData by vm.weightData.collectAsState()
+                        weightData?.let {
+                            WeightResultCard(weightData = it, navController = navController)
+                        }
+                    }
+                }
             }
         }
     }
@@ -130,8 +143,6 @@ private fun ProcessCard(
                 text = mainText,
                 style = MaterialTheme.typography.b2,
             )
-
-
 
             // 2. 로딩 영역
             when (stage) {
@@ -180,90 +191,387 @@ private fun ProcessCard(
 }
 
 @Composable
-private fun CompletedStateCard(  type: MeasurementType,navController: NavController,onEnd: () -> Unit) {
-    // 3초뒤 결과 페이지 이동(페이지 스택 전부 삭제)
-    LaunchedEffect(Unit) {
-        delay(3000)
-        onEnd()
+private fun CompletedStateCard() {
+    // 측정 완료 화면 (3초 후 자동으로 결과 화면으로 전환)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.success),
+            contentDescription = "완료 이미지",
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "측정이 완료되었어요!",
+            style = MaterialTheme.typography.b3,
+            textAlign = TextAlign.Center
+        )
     }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-           Image(
-                painter = painterResource(id = R.drawable.success),
-                contentDescription = "완료 이미지",
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "측정이 완료되었어요!",
-                style = MaterialTheme.typography.b3,
-                textAlign = TextAlign.Center
-            )
-        }
-
 }
 
 @Composable
 private fun ErrorStateCard(onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+       Image(
+            painter = painterResource(id = R.drawable.caution),
+            contentDescription = "에러 이미지",
+        )
 
-        Column(
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "측정이 중단되었어요",
+            style = MaterialTheme.typography.b3,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            text = "다시 한 번 천천히 측정해볼까요?",
+                style = MaterialTheme.typography.b4,
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = onRetry,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .width(329.dp)
+                .height(118.dp),
+            border = BorderStroke(6.dp, Stroke.black20),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = CustomColor.blue,
+            ),
+
+            shape = RoundedCornerShape(30.dp)
         ) {
-           Image(
-                painter = painterResource(id = R.drawable.caution),
-                contentDescription = "에러 이미지",
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
             Text(
-                text = "측정이 중단되었어요",
-                style = MaterialTheme.typography.b3,
+                text = "다시시도",
+                color = CustomColor.white,
+                style = MaterialTheme.typography.b4
             )
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(10.dp))
+// 혈당 결과 화면
+@Composable
+private fun BloodSugarResultCard(
+    bloodSugarData: BloodSugarData,
+    navController: NavController
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize().padding(horizontal = 40.dp)
+    ) {
 
-            Text(
-                text = "다시 한 번 천천히 측정해볼까요?",
-                    style = MaterialTheme.typography.b4,
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Button(
-                onClick = onRetry,
+        // 측정 결과 카드
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
+        ) {
+            Column(
                 modifier = Modifier
-                    .width(329.dp)
-                    .height(118.dp),
-                border = BorderStroke(6.dp, Stroke.black20),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = CustomColor.blue,
-                ),
-
-                shape = RoundedCornerShape(30.dp)
+                    .fillMaxWidth()
+                    .padding(vertical = 46.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // 측정값과 상태
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    // 측정값
+                    Text(
+                        text = "${bloodSugarData.glucoseResult}",
+                        style = MaterialTheme.typography.b1
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Text(
+                        text = "mg/dL",
+                        style = MaterialTheme.typography.b5
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+                    // 상태 배지
+                    bloodSugarData.judgment?.let { judgment ->
+                        Chip(text = judgment.getStatusText(), color = judgment.getStatusColor())
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // 설명 텍스트
                 Text(
-                    text = "다시시도",
-                    color = CustomColor.white,
-                    style = MaterialTheme.typography.b4
+                    text = getBloodSugarDescriptionText(bloodSugarData),
+                    style = MaterialTheme.typography.b4,
                 )
             }
         }
 
+        Spacer(modifier = Modifier.height(23.dp))
+
+        // 하단 버튼들
+        BottomButtons(
+            onViewHistory = {
+                navController.navigate(Screen.BloodSugarHistory.route)
+            },
+            onMeasureOther = {
+                navController.navigate(Screen.Main.route) {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            }
+        )
+    }
+}
+
+// 혈압 결과 화면
+@Composable
+private fun BloodPressureResultCard(
+    bloodPressureData: BloodPressureData,
+    navController: NavController
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize().padding(horizontal = 40.dp)
+    ) {
+
+        // 측정 결과 카드
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 46.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // 측정값과 상태
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    // 측정값
+                    Text(
+                        text = "${bloodPressureData.systolic}/${bloodPressureData.diastolic}",
+                        style = MaterialTheme.typography.b1
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Text(
+                        text = "mmHg",
+                        style = MaterialTheme.typography.b5
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+                    // 상태 배지
+                    bloodPressureData.judgment?.let { judgment ->
+                        Chip(text = "정상", color = CustomColor.blue)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // 설명 텍스트
+                Text(
+                    text = "혈압 수치가 정상 범위에요.",
+                    style = MaterialTheme.typography.b4,
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(23.dp))
+
+        // 하단 버튼들
+        BottomButtons(
+            onViewHistory = {
+                navController.navigate(Screen.BloodSugarHistory.route)
+            },
+            onMeasureOther = {
+                navController.navigate(Screen.Main.route) {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            }
+        )
+    }
+}
+
+// 체중 결과 화면
+@Composable
+private fun WeightResultCard(
+    weightData: WeightData,
+    navController: NavController
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize().padding(horizontal = 40.dp)
+    ) {
+
+        // 측정 결과 카드
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 46.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // 측정값과 상태
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    // 측정값
+                    Text(
+                        text = "${weightData.scale}",
+                        style = MaterialTheme.typography.b1
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Text(
+                        text = "kg",
+                        style = MaterialTheme.typography.b5
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+                    // 상태 배지
+                    weightData.judgment?.let { judgment ->
+                        Chip(text = "정상", color = CustomColor.blue)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // 설명 텍스트
+                Text(
+                    text = "체중이 정상 범위에요.",
+                    style = MaterialTheme.typography.b4,
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(23.dp))
+
+        // 하단 버튼들
+        BottomButtons(
+            onViewHistory = {
+                navController.navigate(Screen.BloodSugarHistory.route)
+            },
+            onMeasureOther = {
+                navController.navigate(Screen.Main.route) {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun BottomButtons(
+    onViewHistory: () -> Unit,
+    onMeasureOther: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(36.dp)
+    ) {
+        OutlinedButton(
+            border = BorderStroke(6.dp, CustomColor.blue),
+            onClick = { onViewHistory() },
+            modifier = Modifier
+                .weight(1f)
+                .height(118.dp),
+            shape = RoundedCornerShape(30.dp)
+        ) {
+            Text(text = "이력보기", color = CustomColor.blue, style = MaterialTheme.typography.b4)
+        }
+
+        OutlinedButton(
+            border = BorderStroke(6.dp, Stroke.black20),
+            onClick = {
+                onMeasureOther()
+             },
+            modifier = Modifier
+                .weight(1f)
+                .height(118.dp),
+            shape = RoundedCornerShape(30.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = CustomColor.blue)
+        ) {
+            Text(text = "다른 항목 측정", color = CustomColor.white, style = MaterialTheme.typography.b4)
+        }
+    }
+}
+
+// 혈당 결과 설명 텍스트 생성
+private fun getBloodSugarDescriptionText(bloodSugarData: BloodSugarData): String {
+    val mealTypeText = when (bloodSugarData.mealFlag) {
+        MealType.BEFORE_MEAL -> "식사 전"
+        MealType.AFTER_MEAL -> "식사 후"
+        else -> ""
+    }
+
+    val statusText = when (bloodSugarData.judgment) {
+        BloodSugarStatus.HIGH -> "높은 편이에요"
+        BloodSugarStatus.LOW -> "낮은 편이에요"
+        BloodSugarStatus.NORMAL -> "정상 범위에요"
+        else -> "측정 결과입니다"
+    }
+
+    return "\"$mealTypeText 혈당 기준으로 보면 $statusText.\""
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun MeasurementScreenPreview_BloodSugar() {
+private fun MeasurementScreenPreview_BloodSugar_Waiting() {
     val nav = rememberNavController()
+    val mockViewModel = MeasurementViewModel(MeasurementType.BloodSugar)
     CompositionLocalProvider(LocalAppNavController provides nav) {
-        MeasurementScreen(nav, MeasurementType.BloodSugar)
+        MeasurementScreen(nav, MeasurementType.BloodSugar, mockViewModel)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MeasurementScreenPreview_BloodSugar_Result() {
+    val nav = rememberNavController()
+    val mockViewModel = MeasurementViewModel(MeasurementType.BloodSugar)
+    // 상태를 결과 화면으로 설정
+    mockViewModel.setStageForPreview(MeasurementStage.ShowingResult)
+    CompositionLocalProvider(LocalAppNavController provides nav) {
+        MeasurementScreen(nav, MeasurementType.BloodSugar, mockViewModel)
     }
 }
 
@@ -271,8 +579,10 @@ private fun MeasurementScreenPreview_BloodSugar() {
 @Composable
 private fun MeasurementScreenPreview_BloodPressure() {
     val nav = rememberNavController()
+    val mockViewModel = MeasurementViewModel(MeasurementType.BloodPressure)
+    mockViewModel.setStageForPreview(MeasurementStage.ShowingResult)
     CompositionLocalProvider(LocalAppNavController provides nav) {
-        MeasurementScreen(nav, MeasurementType.BloodPressure)
+        MeasurementScreen(nav, MeasurementType.BloodPressure, mockViewModel)
     }
 }
 
@@ -280,9 +590,9 @@ private fun MeasurementScreenPreview_BloodPressure() {
 @Composable
 private fun MeasurementScreenPreview_Weight() {
     val nav = rememberNavController()
+    val mockViewModel = MeasurementViewModel(MeasurementType.Weight)
+    mockViewModel.setStageForPreview(MeasurementStage.ShowingResult)
     CompositionLocalProvider(LocalAppNavController provides nav) {
-        MeasurementScreen(nav, MeasurementType.Weight)
+        MeasurementScreen(nav, MeasurementType.Weight, mockViewModel)
     }
 }
-
-

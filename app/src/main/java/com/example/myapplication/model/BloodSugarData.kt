@@ -1,5 +1,6 @@
 package com.example.myapplication.model
 
+import java.io.Serializable
 import BloodSugarStatus
 
 
@@ -12,7 +13,7 @@ data class BloodSugarData(
     val mealFlag: MealType? = null,
     // 판정값 추가
     val judgment: BloodSugarStatus? = null
-)
+): Serializable
 
 enum class MealType {
     BEFORE_MEAL, // 식전
