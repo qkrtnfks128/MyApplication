@@ -64,7 +64,7 @@ fun HistoryRow(
 private fun formatTimeString(timeString: String): String {
     return try {
         val inputFormat = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
-        val outputFormat = SimpleDateFormat("MM월 dd일 a hh:mm", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("MM/dd a hh:mm", Locale.getDefault())
 
         val date = inputFormat.parse(timeString)
         date?.let { outputFormat.format(it) } ?: timeString

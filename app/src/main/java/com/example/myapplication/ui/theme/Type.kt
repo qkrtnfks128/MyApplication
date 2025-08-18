@@ -21,7 +21,7 @@ val Typography = Typography(
     bodyLarge = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(700), fontSize = 80.sp, lineHeight = 120.sp),
     bodyMedium = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(600), fontSize = 72.sp, lineHeight = 100.8.sp),
     bodySmall = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(700), fontSize = 56.sp, lineHeight = 84.sp),
-    titleLarge = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(500), fontSize = 45.sp, lineHeight = 58.5.sp),
+    titleLarge = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(400), fontSize = 45.sp, lineHeight = 58.5.sp),
     titleMedium = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(600), fontSize = 42.sp, lineHeight = 54.6.sp)
 )
 

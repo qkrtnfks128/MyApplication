@@ -56,6 +56,10 @@ import com.example.myapplication.model.BloodPressureData
 import com.example.myapplication.model.WeightData
 import displayName
 import getDescriptionText
+import com.bumptech.glide.Glide
+import android.widget.ImageView
+import android.view.ViewGroup
+import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
 fun MeasurementScreen(
@@ -65,7 +69,6 @@ fun MeasurementScreen(
         factory = MeasurementViewModelFactory(type)
     )
 ) {
-    val context = LocalContext.current
     val userName: String = SelectedUserStore.get()?.name ?: "사용자"
     val stage by vm.stage.collectAsState()
 
@@ -160,7 +163,7 @@ private fun ProcessCard(
                             color = CustomColor.blue,
                             strokeWidth = 6.dp
                         )
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(35.dp))
                         Text(
                             text = "측정대기중",
                             style = MaterialTheme.typography.b4,
@@ -169,10 +172,26 @@ private fun ProcessCard(
                     }
                 }
                 MeasurementStage.Measuring -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(34.dp),
-                        color = CustomColor.blue,
-                        strokeWidth = 6.dp
+                    // AndroidView를 사용하여 Glide와 ImageView 연결
+                    AndroidView(
+                        factory = { context ->
+                            // ImageView 생성
+                            val imageView = ImageView(context).apply {
+                                layoutParams = ViewGroup.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT
+                                )
+                            }
+
+                            // Glide로 GIF 로드
+                            Glide.with(context)
+                                .asGif()
+                                .load(R.drawable.measuring)
+                                .into(imageView)
+
+                            imageView // 생성한 ImageView 반환
+                        },
+                        modifier = Modifier.size(150.dp) // 원하는 크기로 조정
                     )
                 }
                 else -> { /* 처리하지 않음 */ }

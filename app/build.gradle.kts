@@ -106,6 +106,9 @@ dependencies {
     // json 직렬화
  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
+    //for gif image
+ implementation("com.github.bumptech.glide:glide:4.16.0")
+
 
 
     testImplementation(libs.junit)
