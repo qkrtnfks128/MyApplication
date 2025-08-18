@@ -198,7 +198,7 @@ fun PhoneAuthScreen(navController: NavController,vm: PhoneAuthViewModel = viewMo
                         color = if (ui.isLoading) CustomColor.gray01 else CustomColor.blue,
                     ) {
 
-                        vm.submit(NetworkConfig.CUSTOMER_CODE)
+                        vm.submit()
                     }
                 }
             }

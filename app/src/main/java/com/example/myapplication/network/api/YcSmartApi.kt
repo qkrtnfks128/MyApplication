@@ -8,8 +8,10 @@ import BloodSugarNetworkResponse
 import WeightNetworkModel
 import WeightNetworkResponse
 import com.example.myapplication.model.BloodSugarData
+import com.example.myapplication.network.dto.ycsmart.BloodPressureHistoryResponse
 import com.example.myapplication.network.dto.ycsmart.BloodSugarHistoryResponse
 import com.example.myapplication.network.dto.ycsmart.PageInfo
+import com.example.myapplication.network.dto.ycsmart.WeightHistoryResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -39,4 +41,32 @@ interface YcSmartApi{
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
     ): Response<BloodSugarHistoryResponse>
+
+    /**
+     * 혈압 기록 목록을 페이징하여 조회
+     * @param userId 사용자 ID
+     * @param offset 건너뛰기 개수
+     * @param limit 가져올 데이터 개수
+     * @return 혈압 기록 목록
+     */
+    @GET("blood/pressure/history")
+    suspend fun getBloodPressureHistory(
+        @Query("userId") userId: String,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<BloodPressureHistoryResponse>
+
+    /**
+     * 체중 기록 목록을 페이징하여 조회
+     * @param userId 사용자 ID
+     * @param offset 건너뛰기 개수
+     * @param limit 가져올 데이터 개수
+     * @return 체중 기록 목록
+     */
+    @GET("weight/history")
+    suspend fun getWeightHistory(
+        @Query("userId") userId: String,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<WeightHistoryResponse>
 }

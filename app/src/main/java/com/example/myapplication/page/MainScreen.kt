@@ -84,7 +84,7 @@ fun MainScreen(navController: NavController) {
                     )
 
                 }else{
-                    
+
                 Box(
                     modifier = Modifier
                         .clickable { /* 클릭 시 동작 추가 가능 */
@@ -112,7 +112,7 @@ fun MainScreen(navController: NavController) {
 
             }
         )
-        
+
         // 기존 3개 버튼 영역 교체
         val items = listOf(
             MeasurementType.BloodSugar,
@@ -209,9 +209,9 @@ fun MeasurementButton(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .height(96.dp)
+                            .height(220.dp)
                             .border(
-                                width = 10.dp,
+                                width = 6.dp,
                                 color = Stroke.black20,
                                 shape = RoundedCornerShape(30.dp)
                             )
@@ -240,9 +240,9 @@ fun MeasurementButton(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .height(96.dp)
+                            .height(220.dp)
                             .border(
-                                width = 10.dp,
+                                width = 6.dp,
                                 color = Stroke.black20,
                                 shape = RoundedCornerShape(30.dp)
                             )

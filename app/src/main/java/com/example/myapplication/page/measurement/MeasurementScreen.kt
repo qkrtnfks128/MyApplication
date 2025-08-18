@@ -412,7 +412,7 @@ private fun BloodPressureResultCard(
         // 하단 버튼들
         BottomButtons(
             onViewHistory = {
-                navController.navigate(Screen.BloodSugarHistory.route)
+                navController.navigate(Screen.BloodPressureHistory.route)
             },
             onMeasureOther = {
                 navController.navigate(Screen.Main.route) {
@@ -487,7 +487,7 @@ private fun WeightResultCard(
         // 하단 버튼들
         BottomButtons(
             onViewHistory = {
-                navController.navigate(Screen.BloodSugarHistory.route)
+                navController.navigate(Screen.WeightHistory.route)
             },
             onMeasureOther = {
                 navController.navigate(Screen.Main.route) {

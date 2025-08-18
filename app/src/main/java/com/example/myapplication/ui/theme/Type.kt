@@ -15,14 +15,14 @@ private val Pretendard = FontFamily(Font(R.font.pretendard))
 
 // Material3 기본 타입 설정(필요 시 값 조정)
 val Typography = Typography(
-    displayLarge = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.SemiBold, fontSize = 45.sp, lineHeight = 58.5.sp),
-    displayMedium = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Bold, fontSize = 50.sp, lineHeight = 65.sp),
-    displaySmall = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.SemiBold, fontSize = 40.sp, lineHeight = 52.sp),
-    bodyLarge = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Bold, fontSize = 80.sp, lineHeight = 120.sp),
-    bodyMedium = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.SemiBold, fontSize = 72.sp, lineHeight = 100.8.sp),
-    bodySmall = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Bold, fontSize = 56.sp, lineHeight = 84.sp),
-    titleLarge = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Medium, fontSize = 45.sp, lineHeight = 58.5.sp),
-    titleMedium = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.SemiBold, fontSize = 42.sp, lineHeight = 54.6.sp)
+    displayLarge = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(600), fontSize = 45.sp, lineHeight = 58.5.sp),
+    displayMedium = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(700), fontSize = 50.sp, lineHeight = 65.sp),
+    displaySmall = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(600), fontSize = 40.sp, lineHeight = 52.sp),
+    bodyLarge = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(700), fontSize = 80.sp, lineHeight = 120.sp),
+    bodyMedium = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(600), fontSize = 72.sp, lineHeight = 100.8.sp),
+    bodySmall = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(700), fontSize = 56.sp, lineHeight = 84.sp),
+    titleLarge = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(500), fontSize = 45.sp, lineHeight = 58.5.sp),
+    titleMedium = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight(600), fontSize = 42.sp, lineHeight = 54.6.sp)
 )
 
 // 커스텀 네이밍 확장 프로퍼티(디자인 명칭과 매핑)

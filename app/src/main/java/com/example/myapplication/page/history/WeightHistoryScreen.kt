@@ -1,7 +1,6 @@
 package com.example.myapplication.page.history
 
-
-import BloodSugarStatus
+import WeightStatus
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -39,33 +38,39 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import com.example.myapplication.R
-import com.example.myapplication.model.BloodSugarData
+import com.example.myapplication.model.WeightData
 import com.example.myapplication.navigation.LocalAppNavController
 import com.example.myapplication.ui.components.Chip
 import com.example.myapplication.ui.components.CustomToast
 import com.example.myapplication.ui.theme.b1
 import com.example.myapplication.ui.theme.b4
 import com.example.myapplication.ui.theme.b5
-import com.example.myapplication.viewmodel.history.BloodSugarHistoryViewModel
-import displayName
+import com.example.myapplication.viewmodel.history.WeightHistoryViewModel
 import getStatusColor
 import getStatusText
 
-
-// BloodSugarHistoryScreen은 혈당 기록 내역 화면으로, 혈당 기록 내역을 표시합니다.
-// 혈당 기록 내역은 시간순으로 정렬되며, 각 기록은 혈당 수치와 식전/식후 정보를 포함합니다.
+// WeightHistoryScreen은 체중 기록 내역 화면으로, 체중 기록 내역을 표시합니다.
+// 체중 기록 내역은 시간순으로 정렬되며, 각 기록은 체중, BMI, 체지방률, 근육량 정보를 포함합니다.
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun BloodSugarHistoryScreen(
+fun WeightHistoryScreen(
     navController: NavController,
-    viewModel: BloodSugarHistoryViewModel = viewModel()
+    viewModel: WeightHistoryViewModel = viewModel()
 ) {
     // 현재 선택된 사용자 정보 가져오기
       val userName: String = SelectedUserStore.get()?.name ?: "사용자"
     val context = LocalContext.current
 
+    // ViewModel에서 상태 수집
+    val historyItems by viewModel.historyItems.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+
+
+
     Column(
+        modifier = Modifier.fillMaxSize()
     ) {
         // AppBar
         AppBar(
@@ -75,111 +80,96 @@ fun BloodSugarHistoryScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-
-                        Text(
-                            text = "$userName",
-                            // Headline/H2_B
-                            style = TextStyle(
-                              fontSize = 50.sp,
-                              lineHeight = 65.sp,
-                              fontFamily = FontFamily(Font(R.font.pretendard)),
-                              fontWeight = FontWeight(700),
-                              color = Color.Black,
-                              textAlign = TextAlign.Center,
-                            )
-                          )
+                    Text(
+                        text = "$userName",
+                        // Headline/H2_B
+                        style = TextStyle(
+                          fontSize = 50.sp,
+                          lineHeight = 65.sp,
+                          fontFamily = FontFamily(Font(R.font.pretendard)),
+                          fontWeight = FontWeight(700),
+                          color = Color.Black,
+                          textAlign = TextAlign.Center,
+                        )
+                    )
 
                     Spacer(modifier = Modifier.width(6.dp))
 
-                        Text(
-                            text = "어르신",
-                            style = TextStyle(
-                              fontSize = 50.sp,
-                              lineHeight = 65.sp,
-                              fontFamily = FontFamily(Font(R.font.pretendard)),
-                              fontWeight = FontWeight(600),
-                              color = Color.Black,
-                              textAlign = TextAlign.Center,
-                            )
-                          )
-
-                }
-            },
-
-        )
-
-        // 혈당 기록 리스트
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                items(viewModel.historyItems.value.list) { bloodSugarData ->
-                    HistoryRow(
-                        timeString = "${bloodSugarData.date}${bloodSugarData.time}",
-                        rightWidget = {
-                            BloodSugarInfoWidget(bloodSugarData)
-                        }
+                    Text(
+                        text = "어르신",
+                        style = TextStyle(
+                          fontSize = 50.sp,
+                          lineHeight = 65.sp,
+                          fontFamily = FontFamily(Font(R.font.pretendard)),
+                          fontWeight = FontWeight(600),
+                          color = Color.Black,
+                          textAlign = TextAlign.Center,
+                        )
                     )
                 }
+            },
+        )
 
-                // 하단 로딩 표시
-                if (viewModel.isLoading.value) {
-                    item {
-                        Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                        }
+        // 체중 기록 리스트
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            items(historyItems.list) { weightData ->
+                HistoryRow(
+                    timeString = "${weightData.date}${weightData.time}",
+                    rightWidget = {
+                        WeightInfoWidget(weightData)
+                    }
+                )
+            }
+
+            // 하단 로딩 표시
+            if (isLoading) {
+                item {
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
                     }
                 }
             }
-
-
-
-
+        }
     }
 }
 
 @Composable
-fun BloodSugarInfoWidget(bloodSugarData: BloodSugarData) {
+fun WeightInfoWidget(weightData: WeightData) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        // 혈당 수치와 식전/식후 정보
+        // 체중 정보
         Text(
-            text = "${bloodSugarData.mealFlag!!.displayName()}",
-            style = MaterialTheme.typography.b4
-        )
-        Text(
-            text = "${bloodSugarData.glucoseResult}",
+            text = "${String.format("%.1f", weightData.scale)}",
             style = MaterialTheme.typography.b1
         )
         Text(
-            text = "mg/dL",
+            text = "kg",
             style = MaterialTheme.typography.b5
         )
-
         // 상태 라벨
-        Chip(text = bloodSugarData.judgment!!.getStatusText(), color = bloodSugarData.judgment.getStatusColor())
+        Chip(text = weightData.judgment!!.getStatusText(), color = weightData.judgment.getStatusColor())
     }
 }
 
-
-// 테스트 데이터는 ViewModel로 이동
-
 @Preview(showBackground = true)
 @Composable
-fun BloodSugarHistoryScreenPreview() {
+fun WeightHistoryScreenPreview() {
     MyApplicationTheme {
         val nav = rememberNavController()
         // 미리보기용 ViewModel 생성
-        val viewModel : BloodSugarHistoryViewModel = viewModel()
+        val viewModel : WeightHistoryViewModel = viewModel()
 
         CompositionLocalProvider(LocalAppNavController provides nav) {
-            BloodSugarHistoryScreen(nav, viewModel)
+            WeightHistoryScreen(nav, viewModel)
         }
     }
 }

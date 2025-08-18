@@ -4,6 +4,7 @@ import com.example.myapplication.model.AdminSession
 import com.example.myapplication.model.AdminOrg
 import com.example.myapplication.model.UserListItem
 import com.example.myapplication.model.UserListResult
+import com.example.myapplication.network.NetworkConfig
 import com.example.myapplication.network.RetrofitProvider
 import com.example.myapplication.network.api.admin.WonderfulApi
 import com.example.myapplication.network.dto.admin.AdminLoginRequest
@@ -19,7 +20,6 @@ import retrofit2.Response
 interface WonderfulRepository {
     suspend fun adminLogin(email: String, password: String): AdminSession
     suspend fun getUserListUsingPhoneNumber(
-        customerCode: String,
         centerUuid: String,
         number: String
     ): UserListResult
@@ -57,11 +57,11 @@ class WonderfulRepositoryImpl(
     }
 
     override suspend fun getUserListUsingPhoneNumber(
-        customerCode: String,
         centerUuid: String,
         number: String
     ): UserListResult {
-        val response: Response<UserListUsingPhoneNumberResponse> = wonderfulApi.requestUserListUsingPhoneNumber(customerCode, centerUuid, number)
+        val response: Response<UserListUsingPhoneNumberResponse> = wonderfulApi.requestUserListUsingPhoneNumber(
+            NetworkConfig.CUSTOMER_CODE, centerUuid, number)
 
                 val body: UserListUsingPhoneNumberResponse = response.body() ?: throw IllegalStateException("Empty response body")
 

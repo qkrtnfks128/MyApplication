@@ -5,12 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +50,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.foundation.border
 import com.example.myapplication.ui.theme.Stroke
 import androidx.compose.foundation.layout.PaddingValues
+import com.example.myapplication.components.dialog.AlertDialog
 import com.example.myapplication.manager.SelectedUserStore
 
 enum class LeftButtonType {
@@ -106,15 +109,32 @@ fun AppBar(
                 text = "종료",
                 iconTint = CustomColor.red
             )
+            // 종료 확인 다이얼로그 상태 관리
+            val showExitDialog = remember { mutableStateOf(false) }
+
+            // 종료 확인 다이얼로그 표시
+            if (showExitDialog.value) {
+                AlertDialog(
+                    title = "앱을 종료하시겠어요?",
+                    onConfirm = {
+                        // 종료 버튼 클릭 시 동작 구현
+                        (context as? android.app.Activity)?.finish()
+                        // 유저정보 삭제 기능 추가
+                        SelectedUserStore.clear()
+                        // 측정 프로세스 초기화
+                        showExitDialog.value = false
+                    },
+                    onDismiss = {
+                        showExitDialog.value = false
+                    }
+                )
+            }
+
             AppBarButton(
                 buttonConfig = rightButtonConfig,
                 onClick = {
-                    // 종료 버튼 클릭 시 동작 구현
-                    (context as? android.app.Activity)?.finish()
-                // 유저정보 삭제 기능 추가
-                    SelectedUserStore.clear()
-                    // 측정 프로세스 초기화
-
+                    // 종료 확인 다이얼로그 표시
+                    showExitDialog.value = true
                 },
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
@@ -173,7 +193,7 @@ private fun AppBarButton(
 private fun getLeftButtonConfig(buttonType: LeftButtonType): ButtonConfig {
     return when (buttonType) {
         LeftButtonType.HOME -> ButtonConfig(
-            icon = Icons.Default.ArrowBack,
+            icon = Icons.AutoMirrored.Filled.ArrowBack,
             text = "처음으로"
         )
         LeftButtonType.BACK -> ButtonConfig(
@@ -210,7 +230,7 @@ private fun getLeftButtonClickHandler(
         LeftButtonType.BACK -> {
             {
             // 뒤로가기 버튼 클릭 시 현재 액티비티를 종료하여 이전 화면으로 이동합니다.
-            (context as? android.app.Activity)?.onBackPressed()
+            nav.popBackStack()
 
             }
         }

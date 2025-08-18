@@ -15,7 +15,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.page.MainScreen
+import com.example.myapplication.page.history.BloodPressureHistoryScreen
 import com.example.myapplication.page.history.BloodSugarHistoryScreen
+import com.example.myapplication.page.history.WeightHistoryScreen
 import com.example.myapplication.page.login.AdminLoginScreen
 import com.example.myapplication.page.splash.SplashScreen
 import com.example.myapplication.utils.LogManager
@@ -96,6 +98,12 @@ fun AppNavigation() {
         composable(Screen.BloodSugarHistory.route) {
             BloodSugarHistoryScreen(navController)
         }
+        composable(Screen.BloodPressureHistory.route) {
+            BloodPressureHistoryScreen(navController)
+        }
+        composable(Screen.WeightHistory.route) {
+            WeightHistoryScreen(navController)
+        }
         composable(Screen.Login.route) {
             AdminLoginScreen(navController)
         }
@@ -136,62 +144,7 @@ fun AppNavigation() {
 
             MeasurementScreen(navController = navController, type = type, vm = measurementViewModel)
         }
-    //     //  혈당 결과
-    //     composable(Screen.BloodSugarResult.route) { backStackEntry ->
-    //         val current = backStackEntry.savedStateHandle
-    //         val prev = navController.previousBackStackEntry?.savedStateHandle
 
-    //          // 이전 화면에서 다음 화면으로 데이터를 전달하고, 이전 화면의 데이터를 정리
-    //          prev?.get<BloodSugarData>(Screen.BloodSugarResult.KEY_BLOOD_SUGAR_DATA)?.let { moved ->
-    //             current.set(Screen.BloodSugarResult.KEY_BLOOD_SUGAR_DATA, moved)
-    //             prev.remove<BloodSugarData>(Screen.BloodSugarResult.KEY_BLOOD_SUGAR_DATA)
-    //         }
-
-    // // JSON 문자열을 파싱
-    // val jsonData = current.get<String>(Screen.BloodSugarResult.KEY_BLOOD_SUGAR_DATA)
-    // if (jsonData == null) {
-    //     return@composable
-    // }
-
-    // val result = try {
-    //     Json.decodeFromString<BloodSugarData>(jsonData)
-    // } catch (e: Exception) {
-    //     LogManager.error("JSON parsing error", e.toString())
-    //     return@composable
-    // }
-
-    //         BloodSugarResultScreen(navController = navController, bloodSugarData = result)
-    //     }
-    //     // 혈압 결과
-    //     composable(Screen.BloodPressureResult.route) { backStackEntry ->
-    //         val current = backStackEntry.savedStateHandle
-    //         val prev = navController.previousBackStackEntry?.savedStateHandle
-
-    //         // 이전 화면에서 다음 화면으로 데이터를 전달하고, 이전 화면의 데이터를 정리
-    //         prev?.get<BloodPressureData>(Screen.BloodPressureResult.KEY_BLOOD_PRESSURE_DATA)?.let { moved ->
-    //             current.set(Screen.BloodPressureResult.KEY_BLOOD_PRESSURE_DATA, moved)
-    //             prev.remove<BloodPressureData>(Screen.BloodPressureResult.KEY_BLOOD_PRESSURE_DATA)
-    //         }
-
-    //         val result = current.get<BloodPressureData>(Screen.BloodPressureResult.KEY_BLOOD_PRESSURE_DATA)?:return@composable
-
-    //         BloodPressureResultScreen(navController = navController, bloodPressureData = result)
-    //     }
-    //     // 체중 결과
-    //     composable(Screen.WeightResult.route) { backStackEntry ->
-    //         val current = backStackEntry.savedStateHandle
-    //         val prev = navController.previousBackStackEntry?.savedStateHandle
-
-    //         // 이전 화면에서 다음 화면으로 데이터를 전달하고, 이전 화면의 데이터를 정리
-    //         prev?.get<WeightData>(Screen.WeightResult.KEY_WEIGHT_DATA)?.let { moved ->
-    //             current.set(Screen.WeightResult.KEY_WEIGHT_DATA, moved)
-    //             prev.remove<WeightData>(Screen.WeightResult.KEY_WEIGHT_DATA)
-    //         }
-
-    //         val result = current.get<WeightData>(Screen.WeightResult.KEY_WEIGHT_DATA)?:return@composable
-
-    //         WeightResultScreen(navController = navController, weightData = result)
-    //     }
         composable(Screen.Detecting.route) {
             DetectingScreen(navController = navController)
         }
@@ -213,28 +166,19 @@ fun AppNavigation() {
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
     object Main : Screen("main")
-    object BloodSugarHistory : Screen("bloodSugarHistory")
     object Login : Screen("adminLogin")
     object AdminOrgSelect : Screen("adminOrgSelect")
     object UserAuth : Screen("userAuth")
+    object Detecting : Screen("detecting")
     object PhoneAuth : Screen("phoneAuth")
     object UserResult : Screen("userResult") {
         const val KEY_RESULT: String = "user_result"
     }
     object Measurement : Screen("measurement")
-    // object BloodSugarResult : Screen("bloodSugarResult")
-    // {
-    //     const val KEY_BLOOD_SUGAR_DATA: String = "blood_sugar_data"
-    // }
-    // object BloodPressureResult : Screen("bloodPressureResult")
-    // {
-    //     const val KEY_BLOOD_PRESSURE_DATA: String = "blood_pressure_data"
-    // }
-    // object WeightResult : Screen("weightResult")
-    // {
-    //     const val KEY_WEIGHT_DATA: String = "weight_data"
-    // }
-    object Detecting : Screen("detecting")
+    object BloodSugarHistory : Screen("bloodSugarHistory")
+    object BloodPressureHistory : Screen("bloodPressureHistory")
+    object WeightHistory : Screen("weightHistory")
+
     object Error : Screen("error")
 
 }

@@ -3,6 +3,7 @@ package com.example.myapplication.viewmodel.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.manager.SelectedOrgStore
+import com.example.myapplication.model.UserListItem
 import com.example.myapplication.model.UserListResult
 import com.example.myapplication.repository.WonderfulRepository
 import com.example.myapplication.repository.WonderfulRepositoryFactory
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 data class PhoneAuthUiState(
     val digits: List<String> = listOf("", "", "", ""),
     val activeIndex: Int = 0,
-    val isLoading: Boolean = false
+    var isLoading: Boolean = false
 )
 
 sealed class PhoneAuthEvent {
@@ -55,24 +56,44 @@ class PhoneAuthViewModel : ViewModel() {
         }
     }
 
-    fun submit(customerCode: String,) {
-        val s = _uiState.value
-        val number = s.digits.joinToString("")
-
+    fun submit() {
+        val number = _uiState.value.digits.joinToString("")
+        _uiState.value.isLoading = true
           val centerUuid: String = SelectedOrgStore.getSelected()?.orgUuid ?: ""
         viewModelScope.launch {
             if (number.length != 4) {
                 _events.emit(PhoneAuthEvent.Error("4자리를 입력해주세요."))
                 return@launch
             }
-            _uiState.value = s.copy(isLoading = true)
+
             val result: UserListResult = repository.getUserListUsingPhoneNumber(
-                customerCode = customerCode,
                 centerUuid = centerUuid,
                 number = number
             )
+
+            // 유저 2명인 경우의 목데이터 생성
+            val mockResult = UserListResult(
+                statusCode = 1,
+                items = listOf(
+                    UserListItem(
+                        name = "홍길동",
+                        cvid = "CVID-001",
+                        imageUrl = "",
+                        parentTel = "01012345678",
+                        registrationDate = "1954년 01월 18일"
+                    ),
+                    UserListItem(
+                        name = "김철수",
+                        cvid = "CVID-002",
+                        imageUrl = "",
+                        parentTel = "01087654321",
+                        registrationDate = "1960년 03월 01일"
+                    )
+                )
+            )
             _events.emit(PhoneAuthEvent.Success(result))
-            _uiState.value = _uiState.value.copy(isLoading = false)
+
         }
+        _uiState.value.isLoading = false
     }
 }
