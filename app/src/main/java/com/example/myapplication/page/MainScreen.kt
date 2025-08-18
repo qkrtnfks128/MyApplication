@@ -199,7 +199,7 @@ fun MeasurementButton(
             content = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(30.dp)
                 ) {
                     Button(
                         onClick = {
@@ -230,7 +230,6 @@ fun MeasurementButton(
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(16.dp))
 
                     Button(
                         onClick = {

@@ -95,7 +95,7 @@ fun AlertDialog(
                 // 버튼 영역
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.spacedBy(30.dp)
                 ) {
                     // 취소 버튼
                     Button(
