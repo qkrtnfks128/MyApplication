@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.model.BloodSugarData
-import com.example.myapplication.model.MealType
 import com.example.myapplication.model.MeasurementType
 import com.example.myapplication.repository.YcSmartRepositoryFactory
 import kotlinx.coroutines.delay
@@ -133,10 +132,6 @@ class MeasurementViewModel(
                     mealFlag = MealType.AFTER_MEAL,
                     judgment = BloodSugarStatus.HIGH as BloodSugarStatus?
                 )
-
-                // repository.postBloodSugarData(bloodSugarData!!, deviceData!!)
-                // delay(3000)
-                // sendBloodSugarData()
             }
 
             MeasurementType.BloodPressure -> {
@@ -148,8 +143,6 @@ class MeasurementViewModel(
                     pulse = 70,
                     judgment = BloodPressureStatus.NORMAL as BloodPressureStatus?
                 )
-                // delay(3000)
-                // sendBloodPressureData()
             }
             MeasurementType.Weight -> {
                 _weightData.value = WeightData(
@@ -161,48 +154,11 @@ class MeasurementViewModel(
                     muscleRate = 30.0,
                     judgment = WeightStatus.NORMAL as WeightStatus?
                 )
-                // delay(3000)
-                // sendWeightData()
             }
         }
     }
 
     }
-
-    // // BloodSugarData를 JSON으로 변환하여 이벤트로 전달
-    // fun sendBloodSugarData() {
-    //     viewModelScope.launch {
-    //         try {
-    //             // val jsonData = Json.encodeToString(BloodSugarData.serializer(), bloodSugarData!!.value)
-    //             _events.emit(MeasurementEvent.BloodSugarSuccess(bloodSugarData!!.value))
-
-    //         } catch (e: Exception) {
-    //             _events.emit(MeasurementEvent.Error("데이터 변환 실패"))
-    //         }
-    //     }
-    // }
-    // // BloodPressureData를 JSON으로 변환하여 이벤트로 전달
-    // fun sendBloodPressureData() {
-    //     viewModelScope.launch {
-    //         try {
-    //             // val jsonData = Json.encodeToString(BloodPressureData.serializer(), bloodPressureData)
-    //             _events.emit(MeasurementEvent.BloodPressureSuccess(bloodPressure!!.value))
-    //         } catch (e: Exception) {
-    //             _events.emit(MeasurementEvent.Error("데이터 변환 실패"))
-    //         }
-    //     }
-    // }
-    // // WeightData를 JSON으로 변환하여 이벤트로 전달
-    // fun sendWeightData() {
-    //     viewModelScope.launch {
-    //         try {
-    //             // val jsonData = Json.encodeToString(WeightData.serializer(), weightData)
-    //             _events.emit(MeasurementEvent.WeightSuccess(weightData!!.value))
-    //         } catch (e: Exception) {
-    //             _events.emit(MeasurementEvent.Error("데이터 변환 실패"))
-    //         }
-    //     }
-    // }
 
     //재시도
     fun triggerRetry() { _stage.value = MeasurementStage.Waiting }

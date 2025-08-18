@@ -16,10 +16,15 @@ import WeightNetworkModel
 import WeightNetworkResponse
 import com.example.myapplication.model.BloodPressureData
 import com.example.myapplication.model.BloodSugarData
+import com.example.myapplication.model.BloodSugarHistoryData
 import com.example.myapplication.model.WeightData
+import com.example.myapplication.network.ApiResult
 import com.example.myapplication.network.NetworkConfig
 import com.example.myapplication.network.RetrofitProvider
+import com.example.myapplication.network.dto.ycsmart.BloodSugarHistoryResponse
 import com.example.myapplication.network.api.YcSmartApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import okhttp3.OkHttpClient
 import retrofit2.Response
 
@@ -28,6 +33,15 @@ interface YcSmartRepository {
     suspend fun postBloodSugarData(data: BloodSugarData, deviceData: DeviceData): BloodSugarData
     suspend fun postBloodPressureData(data: BloodPressureData, deviceData: DeviceData): BloodPressureData
     suspend fun postWeightData(data: WeightData, deviceData: DeviceData): WeightData
+
+    /**
+     * 혈당 기록 목록을 페이징하여 조회
+     * @param userId 사용자 ID
+     * @param offset 건너뛰기 개수
+     * @param limit 가져올 데이터 개수
+     * @return 혈당 기록 목록
+     */
+    suspend fun getBloodSugarHistory(userId: String, offset: Int, limit: Int): BloodSugarHistoryData
 }
 
 class YcSmartRepositoryImpl(
@@ -124,6 +138,16 @@ class YcSmartRepositoryImpl(
             fatRate = data.fatRate,
             muscleRate = data.muscleRate,
             judgment = response.body()?.judgment ?: null
+        )
+    }
+
+    override suspend fun getBloodSugarHistory(userId: String, offset: Int, limit: Int): BloodSugarHistoryData {
+        val response: Response<BloodSugarHistoryResponse> = ycSmartApi.getBloodSugarHistory(userId, offset, limit)
+        // 인터셉터에서 오류 처리를 하민로 여기서는 오류 처리를 하지 않음
+        // 응답이 성공적이면 데이터를 반환하고, 아니면 빈 목록 반환
+        return BloodSugarHistoryData(
+            hasNext = response.body()?.hasNext ?: false,
+            list = response.body()?.list ?: emptyList()
         )
     }
 }

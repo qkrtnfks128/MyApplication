@@ -2,6 +2,7 @@ package com.example.myapplication.model
 
 import java.io.Serializable
 import BloodSugarStatus
+import MealType
 
 
 data class BloodSugarData(
@@ -15,10 +16,6 @@ data class BloodSugarData(
     val judgment: BloodSugarStatus? = null
 ): Serializable
 
-enum class MealType {
-    BEFORE_MEAL, // 식전
-    AFTER_MEAL   // 식후
-}
 
 
 

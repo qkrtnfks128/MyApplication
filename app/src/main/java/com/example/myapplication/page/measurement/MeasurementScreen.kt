@@ -3,8 +3,12 @@ package com.example.myapplication.page.measurement
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,7 +54,8 @@ import getStatusColor
 import getStatusText
 import com.example.myapplication.model.BloodPressureData
 import com.example.myapplication.model.WeightData
-import com.example.myapplication.model.MealType
+import displayName
+import getDescriptionText
 
 @Composable
 fun MeasurementScreen(
@@ -276,7 +281,7 @@ private fun BloodSugarResultCard(
         // 측정 결과 카드
         Card(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth().border(6.dp, CustomColor.gray06, RoundedCornerShape(10.dp)),
             shape = RoundedCornerShape(10.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
@@ -291,22 +296,25 @@ private fun BloodSugarResultCard(
                 // 측정값과 상태
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
+                    // 측정값
+                    Text(
+                        text = "${bloodSugarData.mealFlag!!.displayName()}",
+                        style = MaterialTheme.typography.b4
+                    )
                     // 측정값
                     Text(
                         text = "${bloodSugarData.glucoseResult}",
                         style = MaterialTheme.typography.b1
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
 
                     Text(
                         text = "mg/dL",
                         style = MaterialTheme.typography.b5
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
                     // 상태 배지
                     bloodSugarData.judgment?.let { judgment ->
                         Chip(text = judgment.getStatusText(), color = judgment.getStatusColor())
@@ -317,7 +325,7 @@ private fun BloodSugarResultCard(
 
                 // 설명 텍스트
                 Text(
-                    text = getBloodSugarDescriptionText(bloodSugarData),
+                    text = bloodSugarData.judgment?.getDescriptionText(bloodSugarData.mealFlag!!) ?: "",
                     style = MaterialTheme.typography.b4,
                 )
             }
@@ -355,7 +363,7 @@ private fun BloodPressureResultCard(
         // 측정 결과 카드
         Card(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth().border(6.dp, CustomColor.gray06, RoundedCornerShape(10.dp)),
             shape = RoundedCornerShape(10.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
@@ -366,11 +374,12 @@ private fun BloodPressureResultCard(
                     .fillMaxWidth()
                     .padding(vertical = 46.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
+
             ) {
                 // 측정값과 상태
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     // 측정값
                     Text(
@@ -378,14 +387,10 @@ private fun BloodPressureResultCard(
                         style = MaterialTheme.typography.b1
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
-
                     Text(
                         text = "mmHg",
                         style = MaterialTheme.typography.b5
                     )
-
-                    Spacer(modifier = Modifier.width(10.dp))
                     // 상태 배지
                     bloodPressureData.judgment?.let { judgment ->
                         Chip(text = "정상", color = CustomColor.blue)
@@ -396,7 +401,7 @@ private fun BloodPressureResultCard(
 
                 // 설명 텍스트
                 Text(
-                    text = "혈압 수치가 정상 범위에요.",
+                    text = bloodPressureData.judgment?.getDescriptionText() ?: "",
                     style = MaterialTheme.typography.b4,
                 )
             }
@@ -434,7 +439,7 @@ private fun WeightResultCard(
         // 측정 결과 카드
         Card(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth().border(6.dp, CustomColor.gray06, RoundedCornerShape(10.dp)),
             shape = RoundedCornerShape(10.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
@@ -449,7 +454,7 @@ private fun WeightResultCard(
                 // 측정값과 상태
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     // 측정값
                     Text(
@@ -457,14 +462,10 @@ private fun WeightResultCard(
                         style = MaterialTheme.typography.b1
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
-
                     Text(
                         text = "kg",
                         style = MaterialTheme.typography.b5
                     )
-
-                    Spacer(modifier = Modifier.width(10.dp))
                     // 상태 배지
                     weightData.judgment?.let { judgment ->
                         Chip(text = "정상", color = CustomColor.blue)
@@ -475,7 +476,7 @@ private fun WeightResultCard(
 
                 // 설명 텍스트
                 Text(
-                    text = "체중이 정상 범위에요.",
+                    text = weightData.judgment?.getDescriptionText() ?: "",
                     style = MaterialTheme.typography.b4,
                 )
             }
@@ -516,6 +517,13 @@ private fun BottomButtons(
                 .height(118.dp),
             shape = RoundedCornerShape(30.dp)
         ) {
+            Icon(
+                imageVector = Icons.Default.List,
+                contentDescription = "History List",
+                tint = CustomColor.blue,
+                modifier = Modifier.size(42.dp)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
             Text(text = "이력보기", color = CustomColor.blue, style = MaterialTheme.typography.b4)
         }
 
@@ -535,31 +543,13 @@ private fun BottomButtons(
     }
 }
 
-// 혈당 결과 설명 텍스트 생성
-private fun getBloodSugarDescriptionText(bloodSugarData: BloodSugarData): String {
-    val mealTypeText = when (bloodSugarData.mealFlag) {
-        MealType.BEFORE_MEAL -> "식사 전"
-        MealType.AFTER_MEAL -> "식사 후"
-        else -> ""
-    }
-
-    val statusText = when (bloodSugarData.judgment) {
-        BloodSugarStatus.HIGH -> "높은 편이에요"
-        BloodSugarStatus.LOW -> "낮은 편이에요"
-        BloodSugarStatus.NORMAL -> "정상 범위에요"
-        else -> "측정 결과입니다"
-    }
-
-    return "\"$mealTypeText 혈당 기준으로 보면 $statusText.\""
-}
 
 @Preview(showBackground = true)
 @Composable
 private fun MeasurementScreenPreview_BloodSugar_Waiting() {
     val nav = rememberNavController()
-    val mockViewModel = MeasurementViewModel(MeasurementType.BloodSugar)
     CompositionLocalProvider(LocalAppNavController provides nav) {
-        MeasurementScreen(nav, MeasurementType.BloodSugar, mockViewModel)
+        MeasurementScreen(nav, MeasurementType.BloodSugar, )
     }
 }
 
@@ -567,11 +557,11 @@ private fun MeasurementScreenPreview_BloodSugar_Waiting() {
 @Composable
 private fun MeasurementScreenPreview_BloodSugar_Result() {
     val nav = rememberNavController()
-    val mockViewModel = MeasurementViewModel(MeasurementType.BloodSugar)
+    val mockViewModel: MeasurementViewModelFactory = MeasurementViewModelFactory(MeasurementType.BloodSugar)
     // 상태를 결과 화면으로 설정
-    mockViewModel.setStageForPreview(MeasurementStage.ShowingResult)
+
     CompositionLocalProvider(LocalAppNavController provides nav) {
-        MeasurementScreen(nav, MeasurementType.BloodSugar, mockViewModel)
+        MeasurementScreen(nav, MeasurementType.BloodSugar, )
     }
 }
 
@@ -579,10 +569,9 @@ private fun MeasurementScreenPreview_BloodSugar_Result() {
 @Composable
 private fun MeasurementScreenPreview_BloodPressure() {
     val nav = rememberNavController()
-    val mockViewModel = MeasurementViewModel(MeasurementType.BloodPressure)
-    mockViewModel.setStageForPreview(MeasurementStage.ShowingResult)
+    val mockViewModel = MeasurementViewModelFactory(MeasurementType.BloodPressure)
     CompositionLocalProvider(LocalAppNavController provides nav) {
-        MeasurementScreen(nav, MeasurementType.BloodPressure, mockViewModel)
+        MeasurementScreen(nav, MeasurementType.BloodPressure, )
     }
 }
 
@@ -590,9 +579,8 @@ private fun MeasurementScreenPreview_BloodPressure() {
 @Composable
 private fun MeasurementScreenPreview_Weight() {
     val nav = rememberNavController()
-    val mockViewModel = MeasurementViewModel(MeasurementType.Weight)
-    mockViewModel.setStageForPreview(MeasurementStage.ShowingResult)
+    val mockViewModel = MeasurementViewModelFactory(MeasurementType.Weight)
     CompositionLocalProvider(LocalAppNavController provides nav) {
-        MeasurementScreen(nav, MeasurementType.Weight, mockViewModel)
+        MeasurementScreen(nav, MeasurementType.Weight, )
     }
 }
